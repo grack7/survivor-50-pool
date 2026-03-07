@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Survivor 50 — The Pool</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --fire: #E8530A;
+    --ember: #F5A623;
+    --gold: #C9A84C;
+    --dark: #0D0B08;
+    --deep: #16120C;
+    --mid: #241E14;
+    --surface: #2E2618;
+    --muted: #6B5F47;
+    --text: #E8DCC8;
+    --text-dim: #9E9080;
+    --torch: #FF6B1A;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Lato', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* Ambient glow */
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 400px;
+    background: radial-gradient(ellipse, rgba(232,83,10,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ---- HEADER ---- */
+  header {
+    text-align: center;
+    padding: 3rem 2rem 2rem;
+    position: relative;
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+  }
+
+  .torch-left, .torch-right {
+    position: absolute;
+    top: 1rem;
+    font-size: 2rem;
+    animation: flicker 2s ease-in-out infinite alternate;
+  }
+  .torch-left { left: 2rem; }
+  .torch-right { right: 2rem; animation-delay: 0.7s; }
+
+  @keyframes flicker {
+    0% { filter: brightness(1) drop-shadow(0 0 8px #FF6B1A); }
+    100% { filter: brightness(1.3) drop-shadow(0 0 20px #FF6B1A); }
+  }
+
+  .season-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  h1 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(2rem, 6vw, 4rem);
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--ember), var(--gold), var(--fire));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+    text-shadow: none;
+    letter-spacing: 0.02em;
+  }
+
+  .subtitle {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    color: var(--muted);
+    margin-top: 0.5rem;
+    text-transform: uppercase;
+  }
+
+  /* ---- NAV TABS ---- */
+  nav {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    padding: 0 2rem;
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+    position: relative;
+    z-index: 10;
+    flex-wrap: wrap;
+  }
+
+  nav button {
+    background: none;
+    border: none;
+    padding: 1rem 1.5rem;
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+    position: relative;
+  }
+
+  nav button:hover { color: var(--text); }
+  nav button.active {
+    color: var(--ember);
+    border-bottom-color: var(--fire);
+  }
+
+  /* ---- MAIN CONTENT ---- */
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ---- LEADERBOARD ---- */
+  .pot-banner {
+    background: linear-gradient(135deg, rgba(232,83,10,0.15), rgba(201,168,76,0.1));
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 4px;
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .pot-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+  }
+
+  .pot-amount {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 2.5rem;
+    color: var(--gold);
+    line-height: 1;
+  }
+
+  .pot-meta {
+    text-align: right;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+
+  .pot-meta span {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    margin-bottom: 0.2rem;
+    text-transform: uppercase;
+  }
+
+  /* Leaderboard table */
+  .lb-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .lb-table th {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+  }
+
+  .lb-table td {
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 0.9rem;
+    vertical-align: middle;
+  }
+
+  .lb-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .rank {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    color: var(--muted);
+    width: 40px;
+  }
+
+  .rank-1 { color: var(--gold); font-size: 1.1rem; }
+  .rank-2 { color: #C0C0C0; }
+  .rank-3 { color: #CD7F32; }
+
+  .player-name {
+    font-family: 'Cinzel', serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .player-picks {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-top: 0.2rem;
+  }
+
+  .score-cell {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.4rem;
+    color: var(--ember);
+    text-align: right;
+  }
+
+  .alive-badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 2px;
+    font-size: 0.65rem;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-right: 0.3rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .alive-badge.alive { background: rgba(100,200,100,0.1); color: #6DC96D; border: 1px solid rgba(100,200,100,0.2); }
+  .alive-badge.out { background: rgba(200,100,100,0.1); color: #C96D6D; border: 1px solid rgba(200,100,100,0.2); text-decoration: line-through; }
+
+  /* ---- CAST GRID ---- */
+  .cast-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 1rem;
+  }
+
+  .cast-card {
+    background: var(--mid);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 4px;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cast-card:hover { border-color: rgba(232,83,10,0.3); transform: translateY(-2px); }
+
+  .cast-card.eliminated {
+    opacity: 0.45;
+  }
+
+  .cast-card.eliminated::after {
+    content: 'VOTED OUT';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%) rotate(-20deg);
+    font-family: 'Cinzel', serif;
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    color: var(--fire);
+    border: 1px solid var(--fire);
+    padding: 0.2rem 0.5rem;
+    white-space: nowrap;
+    opacity: 0.9;
+  }
+
+  .cast-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    margin: 0 auto 0.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    border: 2px solid rgba(201,168,76,0.3);
+  }
+
+  .cast-name {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.2rem;
+  }
+
+  .cast-tribe {
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .cast-owner {
+    font-size: 0.6rem;
+    color: var(--gold);
+    margin-top: 0.4rem;
+    font-family: 'Cinzel', serif;
+  }
+
+  /* ---- WEEKLY PICKS ---- */
+  .week-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .week-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.3rem;
+    color: var(--ember);
+  }
+
+  .week-status {
+    font-size: 0.7rem;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .picks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .pick-card {
+    background: var(--mid);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 4px;
+    padding: 1.2rem;
+  }
+
+  .pick-card-name {
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .pick-select {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text);
+    padding: 0.6rem 0.8rem;
+    font-family: 'Lato', sans-serif;
+    font-size: 0.85rem;
+    border-radius: 2px;
+    cursor: pointer;
+    appearance: none;
+    outline: none;
+  }
+
+  .pick-select:focus { border-color: var(--fire); }
+
+  .pick-result {
+    margin-top: 0.75rem;
+    font-size: 0.75rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 2px;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.1em;
+  }
+
+  .pick-result.correct { background: rgba(100,200,100,0.1); color: #6DC96D; border: 1px solid rgba(100,200,100,0.2); }
+  .pick-result.wrong { background: rgba(200,100,100,0.1); color: #C96D6D; border: 1px solid rgba(200,100,100,0.2); }
+  .pick-result.pending { background: rgba(201,168,76,0.1); color: var(--gold); border: 1px solid rgba(201,168,76,0.2); }
+
+  /* ---- ADMIN ---- */
+  .admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .admin-card {
+    background: var(--mid);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 4px;
+    padding: 1.5rem;
+  }
+
+  .admin-card h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 0.7rem;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+
+  .form-group input, .form-group select {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text);
+    padding: 0.6rem 0.8rem;
+    font-family: 'Lato', sans-serif;
+    font-size: 0.85rem;
+    border-radius: 2px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-group input:focus, .form-group select:focus { border-color: var(--fire); }
+
+  .btn {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--fire), var(--ember));
+    color: white;
+    border: none;
+    padding: 0.6rem 1.4rem;
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+
+  .btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--text-dim);
+  }
+
+  .btn-ghost:hover { border-color: var(--fire); color: var(--text); background: rgba(232,83,10,0.05); }
+
+  .btn-danger {
+    background: linear-gradient(135deg, #8B0000, #C0392B);
+  }
+
+  /* Section headings */
+  .section-heading {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.35em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .section-heading::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.06);
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--surface);
+    border: 1px solid rgba(232,83,10,0.4);
+    color: var(--text);
+    padding: 0.8rem 1.2rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.1em;
+    z-index: 9998;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s;
+    pointer-events: none;
+  }
+
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* Tribe colors */
+  .tribe-cila { color: #E07B2A; }
+  .tribe-kalo { color: #3ABFBF; }
+  .tribe-vatu { color: #C47FD4; }
+  .tribe-merged { color: var(--gold); }
+
+  /* Winner highlight */
+  .winner-row td { background: rgba(201,168,76,0.05); }
+
+  /* Points badge */
+  .points-breakdown {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    margin-top: 0.2rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    h1 { font-size: 1.8rem; }
+    nav button { padding: 0.75rem 0.8rem; font-size: 0.6rem; }
+    .pot-banner { flex-direction: column; text-align: center; }
+    .pot-meta { text-align: center; }
+  }
+
+  /* Entry animation */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .panel.active > * {
+    animation: fadeUp 0.35s ease both;
+  }
+
+  .panel.active > *:nth-child(2) { animation-delay: 0.05s; }
+  .panel.active > *:nth-child(3) { animation-delay: 0.1s; }
+  .panel.active > *:nth-child(4) { animation-delay: 0.15s; }
+
+  /* Admin password overlay */
+  .admin-lock {
+    text-align: center;
+    padding: 4rem 2rem;
+  }
+
+  .admin-lock h2 {
+    font-family: 'Cinzel Decorative', serif;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+  }
+
+  .admin-lock p {
+    color: var(--text-dim);
+    margin-bottom: 2rem;
+    font-size: 0.85rem;
+  }
+
+  .admin-lock input {
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text);
+    padding: 0.7rem 1rem;
+    font-family: 'Lato', sans-serif;
+    font-size: 1rem;
+    border-radius: 2px;
+    outline: none;
+    text-align: center;
+    letter-spacing: 0.3em;
+    margin-right: 0.5rem;
+    width: 180px;
+  }
+
+  /* Scroll hint */
+  .scroll-hint { overflow-x: auto; }
+
+  /* Week selector */
+  .week-selector {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+
+  .week-btn {
+    background: var(--mid);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--text-dim);
+    padding: 0.4rem 0.8rem;
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+
+  .week-btn:hover, .week-btn.active { border-color: var(--fire); color: var(--ember); background: rgba(232,83,10,0.05); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="torch-left">🔥</div>
+  <div class="torch-right">🔥</div>
+  <div class="season-label">Season 50 · Survivor Pool</div>
+  <h1>Survivor 50</h1>
+  <div class="subtitle">The Pool · Winners Never Quit</div>
+</header>
+
+<nav>
+  <button class="active" onclick="showPanel('leaderboard', this)">🏆 Leaderboard</button>
+  <button onclick="showPanel('cast', this)">🏝 Cast</button>
+  <button onclick="showPanel('predictions', this)">🔮 Predictions</button>
+  <button onclick="showPanel('admin', this)">🔒 Admin</button>
+</nav>
+
+<main>
+
+  <!-- LEADERBOARD -->
+  <div id="leaderboard" class="panel active">
+    <div class="pot-banner">
+      <div>
+        <div class="pot-label">Total Pot</div>
+        <div class="pot-amount" id="pot-display">$0</div>
+      </div>
+      <div class="pot-meta">
+        <span>Current Week</span>
+        <strong id="current-week-display" style="font-size:1.1rem;font-family:'Cinzel',serif;color:var(--text)">—</strong>
+      </div>
+      <div class="pot-meta">
+        <span>Players</span>
+        <strong id="player-count" style="font-size:1.1rem;font-family:'Cinzel',serif;color:var(--text)">0</strong>
+      </div>
+    </div>
+
+    <div class="section-heading">Standings</div>
+    <div class="scroll-hint">
+      <table class="lb-table" id="lb-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Player</th>
+            <th>Draft Picks</th>
+            <th>Winner Pick</th>
+            <th>Draft Pts</th>
+            <th style="text-align:right">Total</th>
+          </tr>
+        </thead>
+        <tbody id="lb-body">
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:2rem">
+      <div class="section-heading">Scoring Guide</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:0.75rem;font-size:0.8rem;color:var(--text-dim)">
+        <div style="background:var(--mid);padding:1rem;border-radius:4px;border:1px solid rgba(255,255,255,0.05)">
+          <div style="font-family:'Cinzel',serif;color:var(--gold);font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.6rem">Survival (Draft)</div>
+          <div>Survives a Tribal vote: <strong style="color:var(--ember)">+5</strong></div>
+          <div style="margin-top:0.3rem">Reaches the merge: <strong style="color:var(--ember)">+10</strong></div>
+          <div style="margin-top:0.3rem">Makes Final Tribal: <strong style="color:var(--ember)">+15</strong></div>
+          <div style="margin-top:0.3rem">Wins the season: <strong style="color:var(--ember)">+25</strong></div>
+        </div>
+        <div style="background:var(--mid);padding:1rem;border-radius:4px;border:1px solid rgba(255,255,255,0.05)">
+          <div style="font-family:'Cinzel',serif;color:var(--gold);font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.6rem">Achievements (Draft)</div>
+          <div>Wins immunity challenge: <strong style="color:var(--ember)">+3</strong></div>
+          <div style="margin-top:0.3rem">Finds a hidden idol: <strong style="color:var(--ember)">+5</strong></div>
+          <div style="margin-top:0.3rem">Successfully plays an idol: <strong style="color:var(--ember)">+5</strong></div>
+          <div style="margin-top:0.3rem">Finds/earns any advantage: <strong style="color:var(--ember)">+5</strong></div>
+          <div style="margin-top:0.3rem">Plays an advantage: <strong style="color:var(--ember)">+5</strong></div>
+          <div style="margin-top:0.3rem">Says the episode title: <strong style="color:var(--ember)">+10</strong></div>
+        </div>
+        <div style="background:var(--mid);padding:1rem;border-radius:4px;border:1px solid rgba(255,255,255,0.05)">
+          <div style="font-family:'Cinzel',serif;color:var(--gold);font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.6rem">Preseason Predictions</div>
+          <div>Correct Sole Survivor pick: <strong style="color:var(--ember)">+50</strong></div>
+          <div style="margin-top:0.3rem">Correct Boomerang Idol fate (×2): <strong style="color:var(--ember)">+15 each</strong></div>
+          <div style="margin-top:0.3rem;font-size:0.72rem;color:var(--muted)">Winner pick must be outside your draft. All predictions lock once submitted.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAST -->
+  <div id="cast" class="panel">
+    <div class="section-heading">Full Cast · Season 50</div>
+    <div class="cast-grid" id="cast-grid"></div>
+  </div>
+
+  <!-- PREDICTIONS -->
+  <div id="predictions" class="panel">
+    <div class="section-heading">Preseason Predictions</div>
+    <div style="background:var(--mid);border:1px solid rgba(201,168,76,0.2);border-radius:4px;padding:1.2rem 1.5rem;margin-bottom:1.5rem;font-size:0.85rem;color:var(--text-dim);line-height:1.6">
+      <strong style="color:var(--gold);font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;display:block;margin-bottom:0.5rem">🔮 Three predictions, locked once submitted</strong>
+      <strong style="color:var(--text)">Sole Survivor</strong> — pick someone outside your draft. Correct = <strong style="color:var(--ember)">+50 pts</strong><br>
+      <strong style="color:var(--text)">Boomerang Idol 1</strong> (Genevieve → Ozzy) — predict its fate. Correct = <strong style="color:var(--ember)">+15 pts</strong><br>
+      <strong style="color:var(--text)">Boomerang Idol 2</strong> (Christian → Aubry) — predict its fate. Correct = <strong style="color:var(--ember)">+15 pts</strong>
+    </div>
+    <div id="predictions-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem"></div>
+  </div>
+
+  <!-- ADMIN -->
+  <div id="admin" class="panel">
+    <div id="admin-lock-screen" class="admin-lock">
+      <h2>Tribal Council</h2>
+      <p>Admin access only. Enter the password to continue.</p>
+      <input type="password" id="admin-pass-input" placeholder="••••••" onkeydown="if(event.key==='Enter')checkAdminPass()">
+      <button class="btn" onclick="checkAdminPass()">Enter</button>
+      <div id="admin-pass-error" style="color:#C96D6D;font-size:0.75rem;margin-top:1rem;font-family:'Cinzel',serif;"></div>
+    </div>
+    <div id="admin-panel" style="display:none">
+      <div class="admin-grid">
+
+        <div class="admin-card">
+          <h3>⚙️ Pool Settings</h3>
+          <div class="form-group">
+            <label>Entry Fee ($)</label>
+            <input type="number" id="entry-fee" placeholder="20" oninput="updateSettings()">
+          </div>
+          <div class="form-group">
+            <label>Current Week</label>
+            <input type="number" id="current-week" placeholder="1" min="1" max="15" oninput="updateSettings()">
+          </div>
+          <div class="form-group">
+            <label>Add Player</label>
+            <input type="text" id="new-player-name" placeholder="Player name">
+          </div>
+          <button class="btn" onclick="addPlayer()" style="margin-top:0.5rem">Add Player</button>
+        </div>
+
+        <div class="admin-card">
+          <h3>🗳 Record Elimination</h3>
+          <div class="form-group">
+            <label>Week</label>
+            <input type="number" id="elim-week" placeholder="1" min="1" max="15">
+          </div>
+          <div class="form-group">
+            <label>Voted Out</label>
+            <select id="elim-contestant">
+              <option value="">Select contestant...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Idol / Medevac?</label>
+            <select id="elim-idol">
+              <option value="no">No</option>
+              <option value="yes">Idol played (+15 pts for correct picks)</option>
+              <option value="medevac">Medevac / quit (no weekly points awarded)</option>
+            </select>
+          </div>
+          <button class="btn" onclick="recordElimination()">Record Vote</button>
+        </div>
+
+        <div class="admin-card">
+          <h3>🏅 Draft Assignment</h3>
+          <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem">Assign contestants to players for the draft.</p>
+          <div id="draft-assignments"></div>
+          <button class="btn btn-ghost" onclick="renderDraftAssignments()" style="margin-top:0.5rem;font-size:0.65rem">Refresh</button>
+        </div>
+
+        <div class="admin-card">
+          <h3>🏆 Record Sole Survivor</h3>
+          <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem">When the finale airs, record the winner to award +50 pts to correct predictions and +25 pts to the player who drafted them.</p>
+          <div class="form-group">
+            <label>Sole Survivor</label>
+            <select id="winner-contestant">
+              <option value="">Select winner...</option>
+            </select>
+          </div>
+          <button class="btn" onclick="recordWinner()">Crown Winner 👑</button>
+        </div>
+
+        <div class="admin-card">
+          <h3>⚡ Record Advantage</h3>
+          <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem">Award +5 pts when a drafted player finds or plays any advantage (extra vote, steal-a-vote, block-a-vote, etc.).</p>
+          <div class="form-group">
+            <label>Player</label>
+            <select id="adv-player">
+              <option value="">Select pool player...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Action</label>
+            <select id="adv-action">
+              <option value="find">Found an advantage (+5)</option>
+              <option value="play">Played an advantage (+5)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Note (optional)</label>
+            <input type="text" id="adv-note" placeholder="e.g. Extra vote, ep 4">
+          </div>
+          <button class="btn" onclick="recordAdvantage()">Award Points</button>
+        </div>
+          <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem">Record the final outcome of each idol to award +15 pts to correct predictions.</p>
+          <div class="form-group">
+            <label>Idol 1 · Genevieve → Ozzy</label>
+            <select id="idol1-outcome">
+              <option value="">Select outcome...</option>
+              <option value="played_successfully">Played successfully (saves someone)</option>
+              <option value="voted_out_holding">Holder voted out holding it (boomerangs)</option>
+              <option value="finder_gets_back_plays">Boomerangs back & finder plays it</option>
+              <option value="expires_unused">Expires unused at Final 5</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Idol 2 · Christian → Aubry</label>
+            <select id="idol2-outcome">
+              <option value="">Select outcome...</option>
+              <option value="played_successfully">Played successfully (saves someone)</option>
+              <option value="voted_out_holding">Holder voted out holding it (boomerangs)</option>
+              <option value="finder_gets_back_plays">Boomerangs back & finder plays it</option>
+              <option value="expires_unused">Expires unused at Final 5</option>
+            </select>
+          </div>
+          <button class="btn" onclick="resolveIdols()">Save Outcomes</button>
+        </div>
+          <div class="form-group">
+            <label>New Password</label>
+            <input type="password" id="new-pass" placeholder="New password">
+          </div>
+          <button class="btn btn-ghost" onclick="changePassword()">Update</button>
+        </div>
+
+        <div class="admin-card">
+          <h3>🗑 Reset Data</h3>
+          <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem">Permanently clears all game data. Cannot be undone.</p>
+          <button class="btn btn-danger" onclick="confirmReset()">Reset Everything</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ==================== STATE ====================
+const DEFAULT_CAST = [
+  // CILA (orange)
+  { id: 1,  name: "Joe Hunter",      tribe: "cila", emoji: "🧑‍🚒", alive: true },
+  { id: 2,  name: "Christian",       tribe: "cila", emoji: "🤓", alive: true },
+  { id: 3,  name: "Cirie",           tribe: "cila", emoji: "👑", alive: true },
+  { id: 4,  name: "Ozzy",            tribe: "cila", emoji: "🌊", alive: true },
+  { id: 5,  name: "Emily",           tribe: "cila", emoji: "📈", alive: true },
+  { id: 6,  name: "Rick Devens",     tribe: "cila", emoji: "🎙️", alive: true },
+  { id: 7,  name: "Jenna",           tribe: "cila", emoji: "🪖", alive: false },
+  { id: 8,  name: "Savannah",        tribe: "cila", emoji: "🏆", alive: false },
+  // KALO (teal)
+  { id: 9,  name: "Jonathan",        tribe: "kalo", emoji: "💪", alive: true },
+  { id: 10, name: "Dee",             tribe: "kalo", emoji: "✨", alive: true },
+  { id: 11, name: "Mike White",      tribe: "kalo", emoji: "🎬", alive: true },
+  { id: 12, name: "Kamilla",         tribe: "kalo", emoji: "💻", alive: true },
+  { id: 13, name: "Charlie",         tribe: "kalo", emoji: "⚖️", alive: true },
+  { id: 14, name: "Tiffany",         tribe: "kalo", emoji: "🎨", alive: true },
+  { id: 15, name: "Coach",           tribe: "kalo", emoji: "🐉", alive: true },
+  { id: 16, name: "Chrissy",         tribe: "kalo", emoji: "🔢", alive: true },
+  // VATU (purple)
+  { id: 17, name: "Colby",           tribe: "vatu", emoji: "🤠", alive: true },
+  { id: 18, name: "Genevieve",       tribe: "vatu", emoji: "⚖️", alive: true },
+  { id: 19, name: "Rizo",            tribe: "vatu", emoji: "💼", alive: true },
+  { id: 20, name: "Angelina",        tribe: "vatu", emoji: "👔", alive: true },
+  { id: 21, name: "Q",               tribe: "vatu", emoji: "🏠", alive: true },
+  { id: 22, name: "Stephenie",       tribe: "vatu", emoji: "🔥", alive: true },
+  { id: 23, name: "Kyle Fraser",     tribe: "vatu", emoji: "🏅", alive: false },
+  { id: 24, name: "Aubry",           tribe: "vatu", emoji: "🦋", alive: true },
+];
+
+const TRIBE_NAMES = { cila: "Cila 🟠", kalo: "Kalo 🩵", vatu: "Vatu 💜", merged: "Merged ⭐" };
+
+const STATE_VERSION = 4; // bump this to force-reset cached data
+
+function loadState() {
+  try {
+    const raw = JSON.parse(localStorage.getItem('survivor50_state'));
+    // If no saved state, or saved state is an old version, start fresh
+    // but preserve players, draftPicks, winnerPredictions if they exist
+    if (!raw || raw._version !== STATE_VERSION) {
+      const fresh = getDefaultState();
+      if (raw) {
+        // Carry over player-entered data, just replace the cast/eliminations
+        fresh.players = raw.players || [];
+        fresh.draftPicks = raw.draftPicks || {};
+        fresh.winnerPredictions = raw.winnerPredictions || {};
+        fresh.idolPredictions = raw.idolPredictions || {};
+        fresh.idolOutcomes = raw.idolOutcomes || { idol1: null, idol2: null };
+        fresh.entryFee = raw.entryFee || 20;
+        fresh.adminPassword = raw.adminPassword || 'torch';
+        fresh.scores = raw.scores || {};
+      }
+      return fresh;
+    }
+    return raw;
+  } catch(e) { return getDefaultState(); }
+}
+
+function getDefaultState() {
+  return {
+    _version: STATE_VERSION,
+    adminPassword: "torch",
+    entryFee: 20,
+    currentWeek: 3,
+    players: [],
+    cast: JSON.parse(JSON.stringify(DEFAULT_CAST)),
+    eliminations: [
+      { week: 1, contestantId: 7,  idolPlayed: false },
+      { week: 2, contestantId: 23, idolPlayed: false, isMedevac: true },
+      { week: 3, contestantId: 8,  idolPlayed: false },
+    ],
+    winnerPredictions: {}, // { playerName: contestantId }
+    idolPredictions: {},   // { playerName: { idol1: 'outcome', idol2: 'outcome' } }
+    idolOutcomes: { idol1: null, idol2: null }, // set by admin when resolved
+    soleSurvivor: null,    // contestantId once crowned
+    draftPicks: {},        // { playerName: [contestantId, ...] }
+    scores: {},            // { playerName: { draft: N, prediction: N } }
+  };
+}
+
+let state = loadState();
+
+function saveState() {
+  state._version = STATE_VERSION;
+  localStorage.setItem('survivor50_state', JSON.stringify(state));
+}
+
+// ==================== UTIL ====================
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function getContestant(id) {
+  return state.cast.find(c => c.id === id);
+}
+
+function getPot() {
+  return state.players.length * state.entryFee;
+}
+
+function recalcScores() {
+  state.scores = {};
+  state.players.forEach(p => { state.scores[p] = { draft: 0, prediction: 0 }; });
+
+  // +5 per elimination survived per drafted player
+  state.eliminations.forEach(elim => {
+    state.players.forEach(player => {
+      (state.draftPicks[player] || []).forEach(cid => {
+        if (cid !== elim.contestantId) state.scores[player].draft += 5;
+      });
+    });
+  });
+
+  // Winner prediction: +50 if correct
+  if (state.soleSurvivor) {
+    state.players.forEach(player => {
+      if (state.winnerPredictions[player] === state.soleSurvivor) {
+        state.scores[player].prediction += 50;
+      }
+    });
+  }
+
+  // Idol predictions: +15 each if correct
+  ['idol1', 'idol2'].forEach(idol => {
+    const outcome = state.idolOutcomes?.[idol];
+    if (!outcome) return;
+    state.players.forEach(player => {
+      if (state.idolPredictions?.[player]?.[idol] === outcome) {
+        state.scores[player].prediction += 15;
+      }
+    });
+  });
+
+  saveState();
+}
+
+// ==================== NAV ====================
+function showPanel(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+
+  if (id === 'leaderboard') renderLeaderboard();
+  if (id === 'cast') renderCast();
+  if (id === 'predictions') renderPredictions();
+  if (id === 'admin') renderAdmin();
+}
+
+// ==================== LEADERBOARD ====================
+function renderLeaderboard() {
+  recalcScores();
+  document.getElementById('pot-display').textContent = `$${getPot()}`;
+  document.getElementById('current-week-display').textContent = `Week ${state.currentWeek}`;
+  document.getElementById('player-count').textContent = state.players.length;
+
+  const body = document.getElementById('lb-body');
+  if (state.players.length === 0) {
+    body.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:3rem;font-family:'Cinzel',serif;font-size:0.8rem;letter-spacing:0.2em">NO PLAYERS YET — ADD VIA ADMIN</td></tr>`;
+    return;
+  }
+
+  const sorted = [...state.players].sort((a, b) => {
+    const sa = (state.scores[a]?.draft||0) + (state.scores[a]?.weekly||0);
+    const sb = (state.scores[b]?.draft||0) + (state.scores[b]?.weekly||0);
+    return sb - sa;
+  });
+
+  body.innerHTML = sorted.map((player, i) => {
+    const sc = state.scores[player] || { draft: 0, prediction: 0 };
+    const total = sc.draft + sc.prediction + (sc.bonus || 0);
+    const draftIds = state.draftPicks[player] || [];
+    const picks = draftIds.map(id => {
+      const c = getContestant(id);
+      return c ? `<span class="alive-badge ${c.alive ? 'alive' : 'out'}">${c.name}</span>` : '';
+    }).join('');
+
+    const predId = state.winnerPredictions[player];
+    const predC = predId ? getContestant(predId) : null;
+    const predDisplay = predC
+      ? `<span style="color:${state.soleSurvivor===predId ? '#6DC96D' : state.soleSurvivor ? '#C96D6D' : 'var(--gold)'};font-family:'Cinzel',serif;font-size:0.8rem">${predC.emoji} ${predC.name}</span>`
+      : `<span style="color:var(--muted);font-size:0.75rem;font-style:italic">not set</span>`;
+
+    const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
+    const rankSymbol = i === 0 ? '👑' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i+1);
+
+    return `
+      <tr class="${i===0 ? 'winner-row':''}">
+        <td class="rank ${rankClass}">${rankSymbol}</td>
+        <td>
+          <div class="player-name">${player}</div>
+          <div class="player-picks">${picks || '<span style="color:var(--muted);font-size:0.7rem">No draft picks</span>'}</div>
+        </td>
+        <td>${predDisplay}</td>
+        <td><span style="color:var(--ember);font-family:'Cinzel',serif">${sc.draft}</span></td>
+        <td class="score-cell">${total}</td>
+      </tr>`;
+  }).join('');
+}
+
+// ==================== CAST ====================
+function renderCast() {
+  const grid = document.getElementById('cast-grid');
+  grid.innerHTML = state.cast.map(c => {
+    const owner = state.players.find(p => (state.draftPicks[p]||[]).includes(c.id));
+    return `
+      <div class="cast-card ${c.alive ? '' : 'eliminated'}">
+        <div class="cast-avatar tribe-${c.tribe}">${c.emoji}</div>
+        <div class="cast-name">${c.name}</div>
+        <div class="cast-tribe tribe-${c.tribe}">${TRIBE_NAMES[c.tribe] || c.tribe}</div>
+        ${owner ? `<div class="cast-owner">📌 ${owner}</div>` : '<div class="cast-owner" style="color:var(--muted)">Undrafted</div>'}
+      </div>`;
+  }).join('');
+}
+
+// ==================== PREDICTIONS ====================
+const IDOL_OUTCOMES = [
+  { value: 'played_successfully', label: 'Played successfully (saves someone)' },
+  { value: 'voted_out_holding',   label: 'Holder gets voted out with it (boomerangs back)' },
+  { value: 'finder_gets_back_plays', label: 'Boomerangs back & finder plays it' },
+  { value: 'expires_unused',      label: 'Expires unused at Final 5' },
+];
+
+function idolOutcomeLabel(val) {
+  return IDOL_OUTCOMES.find(o => o.value === val)?.label || val;
+}
+
+function renderPredictions() {
+  const grid = document.getElementById('predictions-grid');
+  if (state.players.length === 0) {
+    grid.innerHTML = `<div style="text-align:center;padding:3rem;color:var(--muted);font-family:'Cinzel',serif;font-size:0.8rem;letter-spacing:0.2em;grid-column:1/-1">ADD PLAYERS VIA ADMIN FIRST</div>`;
+    return;
+  }
+
+  const aliveContestants = state.cast.filter(c => c.alive);
+
+  grid.innerHTML = state.players.map(player => {
+    const wp = state.winnerPredictions[player];
+    const ip = state.idolPredictions[player] || {};
+    const draftIds = state.draftPicks[player] || [];
+    const allLocked = wp && ip.idol1 && ip.idol2;
+
+    // Winner prediction
+    const eligible = aliveContestants.filter(c => !draftIds.includes(c.id));
+    const wpContestant = wp ? getContestant(wp) : null;
+    const wpCorrect = state.soleSurvivor && wp === state.soleSurvivor;
+    const wpWrong  = state.soleSurvivor && wp && !wpCorrect;
+
+    const winnerHtml = wp
+      ? `<div style="font-family:'Cinzel',serif;font-size:0.85rem;color:var(--text);padding:0.4rem 0">${wpContestant?.emoji} ${wpContestant?.name}</div>
+         <div class="pick-result ${wpCorrect?'correct':wpWrong?'wrong':'pending'}" style="margin-bottom:0.5rem">
+           ${wpCorrect ? '👑 Correct! +50 pts' : wpWrong ? '✗ Wrong' : '⏳ Awaiting finale'}
+         </div>`
+      : `<select class="pick-select" style="margin-bottom:0.4rem" onchange="stagePrediction('${player}','winner',this.value)">
+           <option value="">— Pick Sole Survivor —</option>
+           ${eligible.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+         </select>
+         <div style="font-size:0.68rem;color:var(--muted);margin-bottom:0.75rem;font-style:italic">Must be outside your draft picks</div>`;
+
+    // Idol prediction helper
+    function idolHtml(key, label) {
+      const pick = ip[key];
+      const outcome = state.idolOutcomes?.[key];
+      const correct = outcome && pick === outcome;
+      const wrong   = outcome && pick && !correct;
+      const outcomeOpts = IDOL_OUTCOMES.map(o =>
+        `<option value="${o.value}" ${pick===o.value?'selected':''}>${o.label}</option>`
+      ).join('');
+
+      return `<div style="font-size:0.68rem;font-family:'Cinzel',serif;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.3rem">${label}</div>` +
+        (pick
+          ? `<div style="font-size:0.78rem;color:var(--text-dim);padding:0.3rem 0;margin-bottom:0.3rem">${idolOutcomeLabel(pick)}</div>
+             <div class="pick-result ${correct?'correct':wrong?'wrong':'pending'}" style="margin-bottom:0.75rem">
+               ${correct ? '✓ Correct! +15 pts' : wrong ? '✗ Wrong' : '⏳ In play'}
+             </div>`
+          : `<select class="pick-select" style="margin-bottom:0.75rem" onchange="stagePrediction('${player}','${key}',this.value)">
+               <option value="">— Predict outcome —</option>
+               ${outcomeOpts}
+             </select>`
+        );
+    }
+
+    const ptTotal = (wpCorrect?50:0) +
+      (['idol1','idol2'].reduce((s,k) => s + (state.idolOutcomes?.[k] && ip[k]===state.idolOutcomes[k] ? 15 : 0), 0));
+
+    return `
+      <div class="pick-card" style="display:flex;flex-direction:column">
+        <div class="pick-card-name" style="margin-bottom:0.75rem">${player}
+          ${ptTotal > 0 ? `<span style="float:right;color:var(--ember);font-family:'Cinzel Decorative',serif;font-size:0.9rem">+${ptTotal}</span>` : ''}
+        </div>
+        <div style="font-size:0.68rem;font-family:'Cinzel',serif;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.3rem">Sole Survivor</div>
+        ${winnerHtml}
+        ${idolHtml('idol1', '🪃 Idol 1 · Genevieve → Ozzy')}
+        ${idolHtml('idol2', '🪃 Idol 2 · Christian → Aubry')}
+        ${!allLocked ? `<button class="btn" style="margin-top:auto;width:100%;font-size:0.65rem" onclick="lockAllPredictions('${player}')">Lock In All Picks</button>` : ''}
+      </div>`;
+  }).join('');
+}
+
+function stagePrediction(player, key, value) {
+  state._pending = state._pending || {};
+  state._pending[player] = state._pending[player] || {};
+  state._pending[player][key] = value;
+}
+
+function lockAllPredictions(player) {
+  const pending = state._pending?.[player] || {};
+
+  // Winner
+  if (!state.winnerPredictions[player]) {
+    const cid = parseInt(pending.winner);
+    if (!cid) { toast('Select a Sole Survivor pick first'); return; }
+    const draftIds = state.draftPicks[player] || [];
+    if (draftIds.includes(cid)) { toast('Sole Survivor cannot be one of your draft players!'); return; }
+    state.winnerPredictions[player] = cid;
+  }
+
+  // Idols
+  state.idolPredictions[player] = state.idolPredictions[player] || {};
+  if (!state.idolPredictions[player].idol1) {
+    if (!pending.idol1) { toast('Select an outcome for Idol 1'); return; }
+    state.idolPredictions[player].idol1 = pending.idol1;
+  }
+  if (!state.idolPredictions[player].idol2) {
+    if (!pending.idol2) { toast('Select an outcome for Idol 2'); return; }
+    state.idolPredictions[player].idol2 = pending.idol2;
+  }
+
+  saveState();
+  renderPredictions();
+  toast(`${player}'s predictions locked! 🔮`);
+}
+
+// ==================== ADMIN ====================
+let adminUnlocked = false;
+
+function renderAdmin() {
+  if (adminUnlocked) showAdminPanel();
+}
+
+function checkAdminPass() {
+  const input = document.getElementById('admin-pass-input').value;
+  if (input === state.adminPassword) {
+    adminUnlocked = true;
+    showAdminPanel();
+  } else {
+    document.getElementById('admin-pass-error').textContent = 'Wrong password. (Default: torch)';
+  }
+}
+
+function showAdminPanel() {
+  document.getElementById('admin-lock-screen').style.display = 'none';
+  document.getElementById('admin-panel').style.display = 'block';
+  document.getElementById('entry-fee').value = state.entryFee;
+  document.getElementById('current-week').value = state.currentWeek;
+  populateElimSelect();
+  populateWinnerSelect();
+  // Populate idol outcome selects if already set
+  const io = state.idolOutcomes || {};
+  if (io.idol1) document.getElementById('idol1-outcome').value = io.idol1;
+  if (io.idol2) document.getElementById('idol2-outcome').value = io.idol2;
+  renderDraftAssignments();
+  // Populate advantage player dropdown
+  const advSel = document.getElementById("adv-player");
+  if (advSel) {
+    advSel.innerHTML = '<option value="">Select pool player...</option>' +
+      state.players.map(p => `<option value="${p}">${p}</option>`).join('');
+  }
+}
+
+function populateWinnerSelect() {
+  const sel = document.getElementById('winner-contestant');
+  const alive = state.cast.filter(c => c.alive);
+  sel.innerHTML = `<option value="">Select winner...</option>` +
+    alive.map(c => `<option value="${c.id}" ${state.soleSurvivor===c.id?'selected':''}>${c.name}</option>`).join('');
+}
+
+function recordWinner() {
+  const cid = parseInt(document.getElementById('winner-contestant').value);
+  if (!cid) { toast('Select a contestant'); return; }
+  state.soleSurvivor = cid;
+  recalcScores();
+  saveState();
+  const c = getContestant(cid);
+  toast(`${c?.name} crowned Sole Survivor! 👑`);
+}
+
+function populateElimSelect() {
+  const sel = document.getElementById('elim-contestant');
+  const alive = state.cast.filter(c => c.alive);
+  sel.innerHTML = `<option value="">Select contestant...</option>` +
+    alive.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+}
+
+function updateSettings() {
+  const fee = parseInt(document.getElementById('entry-fee').value);
+  const week = parseInt(document.getElementById('current-week').value);
+  if (!isNaN(fee)) state.entryFee = fee;
+  if (!isNaN(week)) state.currentWeek = week;
+  saveState();
+}
+
+function addPlayer() {
+  const name = document.getElementById('new-player-name').value.trim();
+  if (!name) { toast('Enter a name first'); return; }
+  if (state.players.includes(name)) { toast('Player already exists'); return; }
+  state.players.push(name);
+  state.scores[name] = { draft: 0, weekly: 0 };
+  saveState();
+  document.getElementById('new-player-name').value = '';
+  document.getElementById('player-count').textContent = state.players.length;
+  renderDraftAssignments();
+  toast(`Added ${name} to the pool`);
+}
+
+function recordElimination() {
+  const week = parseInt(document.getElementById('elim-week').value);
+  const cid = parseInt(document.getElementById('elim-contestant').value);
+  const idol = document.getElementById('elim-idol').value;
+  const idolPlayed = idol === 'yes';
+  const isMedevac = idol === 'medevac';
+
+  if (isNaN(week) || isNaN(cid) || !cid) { toast('Fill in all fields'); return; }
+  if (state.eliminations.find(e => e.week === week)) { toast('Week already recorded'); return; }
+
+  state.eliminations.push({ week, contestantId: cid, idolPlayed, isMedevac });
+  const c = getContestant(cid);
+  if (c) c.alive = false;
+
+  recalcScores();
+  saveState();
+  populateElimSelect();
+  toast(`${c?.name || 'Contestant'} voted out in Week ${week}`);
+}
+
+function renderDraftAssignments() {
+  const container = document.getElementById('draft-assignments');
+  if (state.players.length === 0) {
+    container.innerHTML = `<p style="color:var(--muted);font-size:0.75rem">No players yet.</p>`;
+    return;
+  }
+
+  container.innerHTML = state.players.map(player => {
+    const picked = state.draftPicks[player] || [];
+    const aliveContestants = state.cast.filter(c => c.alive);
+    const unowned = state.cast.filter(c => {
+      const ownerExists = state.players.some(p => (state.draftPicks[p]||[]).includes(c.id));
+      return !ownerExists || (state.draftPicks[player]||[]).includes(c.id);
+    });
+
+    const options = state.cast.map(c => {
+      const ownerExists = state.players.some(p => p !== player && (state.draftPicks[p]||[]).includes(c.id));
+      return `<option value="${c.id}" ${picked.includes(c.id)?'selected':''} ${ownerExists?'disabled':''}>
+        ${c.name}${ownerExists?' (taken)':''}${!c.alive?' ✗':''}
+      </option>`;
+    }).join('');
+
+    return `<div style="margin-bottom:1rem">
+      <label style="font-size:0.7rem;font-family:'Cinzel',serif;color:var(--muted);letter-spacing:0.1em;display:block;margin-bottom:0.4rem">${player}</label>
+      <select multiple style="width:100%;background:var(--surface);border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:0.4rem;font-size:0.8rem;border-radius:2px;height:80px" onchange="updateDraftPick('${player}', this)">
+        ${options}
+      </select>
+    </div>`;
+  }).join('');
+}
+
+function updateDraftPick(player, sel) {
+  const selected = Array.from(sel.selectedOptions).map(o => parseInt(o.value));
+  state.draftPicks[player] = selected;
+  saveState();
+  recalcScores();
+  toast(`Draft picks updated for ${player}`);
+}
+
+
+function resolveIdols() {
+  const i1 = document.getElementById('idol1-outcome').value;
+  const i2 = document.getElementById('idol2-outcome').value;
+  if (!i1 && !i2) { toast('Select at least one outcome'); return; }
+  state.idolOutcomes = state.idolOutcomes || {};
+  if (i1) state.idolOutcomes.idol1 = i1;
+  if (i2) state.idolOutcomes.idol2 = i2;
+  recalcScores();
+  saveState();
+  toast('Idol outcomes saved! 🪃');
+}
+
+function recordAdvantage() {
+  const player = document.getElementById("adv-player").value;
+  const action = document.getElementById("adv-action").value;
+  if (!player) { toast("Select a pool player"); return; }
+  if (!state.scores[player]) state.scores[player] = { draft: 0, prediction: 0, bonus: 0 };
+  state.scores[player].bonus = (state.scores[player].bonus || 0) + 5;
+  const label = action === "find" ? "found" : "played";
+  const note = document.getElementById("adv-note").value.trim();
+  saveState();
+  toast(`+5 pts for ${player} — ${label} an advantage${note ? " (" + note + ")" : ""}! ⚡`);
+  document.getElementById("adv-note").value = "";
+}
+
+function changePassword() {
+  if (!p) { toast('Enter a new password'); return; }
+  state.adminPassword = p;
+  saveState();
+  toast('Password updated');
+}
+
+function confirmReset() {
+  if (confirm('Are you sure? This will delete ALL game data.')) {
+    localStorage.removeItem('survivor50_state');
+    state = getDefaultState();
+    saveState();
+    adminUnlocked = false;
+    document.getElementById('admin-lock-screen').style.display = 'block';
+    document.getElementById('admin-panel').style.display = 'none';
+    document.getElementById('admin-pass-input').value = '';
+    toast('Data reset. Starting fresh.');
+  }
+}
+
+// ==================== INIT ====================
+renderLeaderboard();
+</script>
+</body>
+</html>
