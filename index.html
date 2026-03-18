@@ -1312,7 +1312,6 @@ function recordElimination() {
   const isMedevac = idol === 'medevac';
 
   if (isNaN(week) || isNaN(cid) || !cid) { toast('Fill in all fields'); return; }
-  if (state.eliminations.find(e => e.week === week)) { toast('Week already recorded'); return; }
 
   state.eliminations.push({ week, contestantId: cid, idolPlayed, isMedevac });
   const c = getContestant(cid);
