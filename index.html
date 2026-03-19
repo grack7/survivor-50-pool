@@ -758,6 +758,65 @@
     </div>
     <div id="admin-panel" style="display:none">
       <div class="admin-grid">
+        <div class="admin-card" style="grid-column:1/-1">
+  <h3>📺 Record Episode</h3>
+  <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:1.5rem">Log everything that happened in one go. Review the summary before applying points.</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem">
+
+    <div>
+      <div style="font-size:0.7rem;font-family:'Cinzel',serif;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem">Episode Week #</div>
+      <input type="number" id="ep-week" placeholder="e.g. 4" min="1" max="15" style="width:100%;background:var(--surface);border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:0.6rem 0.8rem;font-family:'Lato',sans-serif;font-size:0.85rem;border-radius:2px;outline:none">
+    </div>
+
+    <div>
+      <div style="font-size:0.7rem;font-family:'Cinzel',serif;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem">Voted Out / Medevac</div>
+      <select id="ep-boot" style="width:100%;background:var(--surface);border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:0.6rem 0.8rem;font-family:'Lato',sans-serif;font-size:0.85rem;border-radius:2px;outline:none;margin-bottom:0.4rem">
+        <option value="">— Nobody / skip —</option>
+      </select>
+      <select id="ep-boot-type" style="width:100%;background:var(--surface);border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:0.6rem 0.8rem;font-family:'Lato',sans-serif;font-size:0.85rem;border-radius:2px;outline:none">
+        <option value="voted">Voted out</option>
+        <option value="medevac">Medevac / quit (no survival pts)</option>
+      </select>
+    </div>
+
+    <div>
+      <div style="font-size:0.7rem;font-family:'Cinzel',serif;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem">Won Immunity <span style="color:var(--muted)">(+3 pts)</span></div>
+      <div id="ep-immunity-list" style="max-height:160px;overflow-y:auto;background:var(--surface);border:1px solid rgba(255,255,255,0.1);border-radius:2px;padding:0.4rem 0.6rem"></div>
+      <div style="font-size:0.65rem;color:var(--muted);margin-top:0.3rem;font-style:italic">Only drafted contestants shown</div>
+    </div>
+
+    <div>
+      <div style="font-size:0.7rem;font-family:'Cinzel',serif;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem">Found Idol or Advantage <span style="color:var(--muted)">(+5 pts each)</span></div>
+      <div id="ep-found-list" style="max-height:160px;overflow-y:auto;background:var(--surface);border:1px solid rgba(255,255,255,0.1);border-radius:2px;padding:0.4rem 0.6rem"></div>
+      <div style="font-size:0.65rem;color:var(--muted);margin-top:0.3rem;font-style:italic">Only drafted contestants shown</div>
+    </div>
+
+    <div>
+      <div style="font-size:0.7rem;font-family:'Cinzel',serif;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem">Played Idol or Advantage <span style="color:var(--muted)">(+5 pts each)</span></div>
+      <div id="ep-played-list" style="max-height:160px;overflow-y:auto;background:var(--surface);border:1px solid rgba(255,255,255,0.1);border-radius:2px;padding:0.4rem 0.6rem"></div>
+      <div style="font-size:0.65rem;color:var(--muted);margin-top:0.3rem;font-style:italic">Only drafted contestants shown</div>
+    </div>
+
+    <div>
+      <div style="font-size:0.7rem;font-family:'Cinzel',serif;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem">Said Episode Title <span style="color:var(--muted)">(+10 pts)</span></div>
+      <div id="ep-title-list" style="max-height:160px;overflow-y:auto;background:var(--surface);border:1px solid rgba(255,255,255,0.1);border-radius:2px;padding:0.4rem 0.6rem"></div>
+      <div style="font-size:0.65rem;color:var(--muted);margin-top:0.3rem;font-style:italic">Only drafted contestants shown</div>
+    </div>
+
+  </div>
+  <button class="btn" onclick="previewEpisode()" style="margin-top:1.5rem;font-size:0.8rem;padding:0.8rem 2rem">Preview Summary →</button>
+</div>
+
+<div id="ep-summary-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:10000;align-items:center;justify-content:center;padding:1rem">
+  <div style="background:var(--mid);border:1px solid rgba(201,168,76,0.3);border-radius:6px;max-width:500px;width:100%;padding:2rem;max-height:90vh;overflow-y:auto">
+    <div style="font-family:'Cinzel Decorative',serif;color:var(--gold);font-size:1.1rem;margin-bottom:1.5rem">📺 Episode Summary</div>
+    <div id="ep-summary-content" style="font-size:0.85rem;line-height:1.8;color:var(--text-dim)"></div>
+    <div style="display:flex;gap:1rem;margin-top:1.5rem">
+      <button class="btn" onclick="applyEpisode()" style="flex:1">✅ Apply Points</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('ep-summary-modal').style.display='none'" style="flex:1">← Go Back</button>
+    </div>
+  </div>
+</div>
 
         <div class="admin-card">
           <h3>🌐 Shared Backend</h3>
@@ -1095,8 +1154,10 @@ function getPot() {
 }
 
 function recalcScores() {
+  const existingBonuses = {};
+  state.players.forEach(p => { existingBonuses[p] = state.scores[p]?.bonus || 0; });
   state.scores = {};
-  state.players.forEach(p => { state.scores[p] = { draft: 0, prediction: 0 }; });
+  state.players.forEach(p => { state.scores[p] = { draft: 0, prediction: 0, bonus: existingBonuses[p] || 0 }; });
 
   // +5 per elimination survived per drafted player
   state.eliminations.forEach(elim => {
@@ -1354,6 +1415,7 @@ function showAdminPanel() {
   if (io.idol1) document.getElementById('idol1-outcome').value = io.idol1;
   if (io.idol2) document.getElementById('idol2-outcome').value = io.idol2;
   renderDraftAssignments();
+  renderEpisodeForm();
 
   const advSel = document.getElementById("adv-player");
   if (advSel) {
