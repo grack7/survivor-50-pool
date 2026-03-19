@@ -801,7 +801,7 @@
 
         <div class="admin-card">
           <h3>🏅 Draft Assignment</h3>
-          <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem">Assign contestants to players for the draft.</p>
+          <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem">Check up to 5 picks per player, then click Lock In.</p>
           <div id="draft-assignments"></div>
         </div>
 
@@ -839,6 +839,9 @@
           </div>
           <button class="btn" onclick="recordAdvantage()">Award Points</button>
         </div>
+
+        <div class="admin-card">
+          <h3>🪃 Resolve Boomerang Idols</h3>
           <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem">Record the final outcome of each idol to award +15 pts to correct predictions.</p>
           <div class="form-group">
             <label>Idol 1 · Genevieve → Ozzy</label>
@@ -862,6 +865,9 @@
           </div>
           <button class="btn" onclick="resolveIdols()">Save Outcomes</button>
         </div>
+
+        <div class="admin-card">
+          <h3>🔑 Change Password</h3>
           <div class="form-group">
             <label>New Password</label>
             <input type="password" id="new-pass" placeholder="New password">
@@ -1234,7 +1240,7 @@ function checkAdminPass() {
     adminUnlocked = true;
     showAdminPanel();
   } else {
-    document.getElementById('admin-pass-error').textContent = 'Wrong password.';
+    document.getElementById('admin-pass-error').textContent = 'Wrong password. (Default: torch)';
   }
 }
 
@@ -1312,6 +1318,7 @@ function recordElimination() {
 
   if (isNaN(week) || isNaN(cid) || !cid) { toast('Fill in all fields'); return; }
 
+
   state.eliminations.push({ week, contestantId: cid, idolPlayed, isMedevac });
   const c = getContestant(cid);
   if (c) c.alive = false;
@@ -1383,15 +1390,8 @@ function lockDraftPicks(player) {
   renderDraftAssignments();
   toast(`${player}'s ${checked.length} picks locked in! 🔒`);
 }
-```
 
-Also change the draft card description line from:
-```
-Assign contestants to players for the draft.
-```
-to:
-```
-Check up to 5 picks per player, then click Lock In.
+
 function resolveIdols() {
   const i1 = document.getElementById('idol1-outcome').value;
   const i2 = document.getElementById('idol2-outcome').value;
@@ -1418,6 +1418,7 @@ function recordAdvantage() {
 }
 
 function changePassword() {
+  const p = document.getElementById('new-pass').value.trim();
   if (!p) { toast('Enter a new password'); return; }
   state.adminPassword = p;
   saveState();
