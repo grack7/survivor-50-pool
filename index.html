@@ -691,8 +691,7 @@
             <th>Player</th>
             <th>Draft Picks</th>
             <th>Winner Pick</th>
-            <th>Draft Pts</th>
-            <th style="text-align:right">Total</th>
+            <th style="text-align:right">Score</th>
           </tr>
         </thead>
         <tbody id="lb-body">
@@ -1217,12 +1216,12 @@ function renderLeaderboard() {
     return;
   }
 
-  const sorted = [...state.players].sort((a, b) => {
-    const sa = (state.scores[a]?.draft||0) + (state.scores[a]?.weekly||0);
-    const sb = (state.scores[b]?.draft||0) + (state.scores[b]?.weekly||0);
-    return sb - sa;
-  });
-
+const sorted = [...state.players].sort((a, b) => {
+  const sa = (state.scores[a]?.draft||0) + (state.scores[a]?.prediction||0) + (state.scores[a]?.bonus||0);
+  const sb = (state.scores[b]?.draft||0) + (state.scores[b]?.prediction||0) + (state.scores[b]?.bonus||0);
+  return sb - sa;
+});
+  
   body.innerHTML = sorted.map((player, i) => {
     const sc = state.scores[player] || { draft: 0, prediction: 0 };
     const total = sc.draft + sc.prediction + (sc.bonus || 0);
@@ -1248,9 +1247,8 @@ function renderLeaderboard() {
           <div class="player-name">${player}</div>
           <div class="player-picks">${picks || '<span style="color:var(--muted);font-size:0.7rem">No draft picks</span>'}</div>
         </td>
-        <td>${predDisplay}</td>
-        <td><span style="color:var(--ember);font-family:'Cinzel',serif">${sc.draft}</span></td>
-        <td class="score-cell">${total}</td>
+      <td>${predDisplay}</td>
+      <td class="score-cell">${total}</td>
       </tr>`;
   }).join('');
 }
