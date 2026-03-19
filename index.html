@@ -760,6 +760,17 @@
       <div class="admin-grid">
 
         <div class="admin-card">
+          <h3>🌐 Shared Backend</h3>
+          <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem">Your pool data is stored in the cloud. Everyone on the same device/browser shares the same blob automatically via this site's URL.</p>
+          <div style="font-size:0.7rem;color:var(--muted);font-family:'Cinzel',serif;letter-spacing:0.1em;margin-bottom:0.4rem;text-transform:uppercase">Blob ID</div>
+          <div id="blob-id-display" style="font-size:0.75rem;color:var(--text);background:var(--surface);padding:0.5rem 0.75rem;border-radius:2px;word-break:break-all;margin-bottom:0.75rem;border:1px solid rgba(255,255,255,0.08)">Loading...</div>
+          <button class="btn btn-ghost" style="font-size:0.65rem;width:100%" onclick="copyBlobId()">Copy Blob ID</button>
+          <div style="margin-top:1rem;font-size:0.7rem;color:var(--muted);font-family:'Cinzel',serif;letter-spacing:0.1em;margin-bottom:0.4rem;text-transform:uppercase">Connect to existing blob</div>
+          <input type="text" id="blob-id-input" placeholder="Paste blob ID here" style="width:100%;background:var(--surface);border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:0.6rem 0.8rem;font-family:'Lato',sans-serif;font-size:0.85rem;border-radius:2px;outline:none;margin-bottom:0.5rem">
+          <button class="btn" style="font-size:0.65rem;width:100%" onclick="connectBlob()">Connect</button>
+        </div>
+
+        <div class="admin-card">
           <h3>⚙️ Pool Settings</h3>
           <div class="form-group">
             <label>Entry Fee ($)</label>
@@ -847,16 +858,20 @@
             <label>Idol 1 · Genevieve → Ozzy</label>
             <select id="idol1-outcome">
               <option value="">Select outcome...</option>
-            <option value="recipient_plays">Boomerang recipient plays the idol</option>
-            <option value="boomerangs_back">Idol boomerangs back to original finder</option>
+              <option value="played_successfully">Played successfully (saves someone)</option>
+              <option value="voted_out_holding">Holder voted out holding it (boomerangs)</option>
+              <option value="finder_gets_back_plays">Boomerangs back & finder plays it</option>
+              <option value="expires_unused">Expires unused at Final 5</option>
             </select>
           </div>
           <div class="form-group">
             <label>Idol 2 · Christian → Aubry</label>
             <select id="idol2-outcome">
               <option value="">Select outcome...</option>
-            <option value="recipient_plays">Boomerang recipient plays the idol</option>
-            <option value="boomerangs_back">Idol boomerangs back to original finder</option>
+              <option value="played_successfully">Played successfully (saves someone)</option>
+              <option value="voted_out_holding">Holder voted out holding it (boomerangs)</option>
+              <option value="finder_gets_back_plays">Boomerangs back & finder plays it</option>
+              <option value="expires_unused">Expires unused at Final 5</option>
             </select>
           </div>
           <button class="btn" onclick="resolveIdols()">Save Outcomes</button>
@@ -882,6 +897,15 @@
   </div>
 
 </main>
+
+<!-- Loading overlay -->
+<div id="app-loader" style="display:flex;position:fixed;inset:0;background:var(--dark);z-index:99999;align-items:center;justify-content:center;flex-direction:column;gap:1rem">
+  <div style="font-size:3rem;animation:flicker 1s ease-in-out infinite alternate">🔥</div>
+  <div id="app-loader-msg" style="font-family:'Cinzel',serif;color:var(--gold);letter-spacing:0.2em;font-size:0.8rem;text-transform:uppercase">Loading...</div>
+</div>
+
+<!-- Sync indicator -->
+<div id="sync-indicator" style="position:fixed;bottom:1rem;left:1rem;font-family:'Cinzel',serif;font-size:0.65rem;color:var(--gold);letter-spacing:0.15em;opacity:0;transition:opacity 0.3s;z-index:9997">⟳ Syncing...</div>
 
 <div class="toast" id="toast"></div>
 
@@ -919,31 +943,12 @@ const DEFAULT_CAST = [
 
 const TRIBE_NAMES = { cila: "Cila 🟠", kalo: "Kalo 🩵", vatu: "Vatu 💜", merged: "Merged ⭐" };
 
-const STATE_VERSION = 4; // bump this to force-reset cached data
+const STATE_VERSION = 4;
+const JSONBLOB_API = 'https://jsonblob.com/api/jsonBlob';
 
-function loadState() {
-  try {
-    const raw = JSON.parse(localStorage.getItem('survivor50_state'));
-    // If no saved state, or saved state is an old version, start fresh
-    // but preserve players, draftPicks, winnerPredictions if they exist
-    if (!raw || raw._version !== STATE_VERSION) {
-      const fresh = getDefaultState();
-      if (raw) {
-        // Carry over player-entered data, just replace the cast/eliminations
-        fresh.players = raw.players || [];
-        fresh.draftPicks = raw.draftPicks || {};
-        fresh.winnerPredictions = raw.winnerPredictions || {};
-        fresh.idolPredictions = raw.idolPredictions || {};
-        fresh.idolOutcomes = raw.idolOutcomes || { idol1: null, idol2: null };
-        fresh.entryFee = raw.entryFee || 20;
-        fresh.adminPassword = raw.adminPassword || 'torch';
-        fresh.scores = raw.scores || {};
-      }
-      return fresh;
-    }
-    return raw;
-  } catch(e) { return getDefaultState(); }
-}
+let state = getDefaultState();
+let blobId = localStorage.getItem('survivor50_blobId') || null;
+let saveTimeout = null;
 
 function getDefaultState() {
   return {
@@ -958,20 +963,140 @@ function getDefaultState() {
       { week: 2, contestantId: 23, idolPlayed: false, isMedevac: true },
       { week: 3, contestantId: 8,  idolPlayed: false },
     ],
-    winnerPredictions: {}, // { playerName: contestantId }
-    idolPredictions: {},   // { playerName: { idol1: 'outcome', idol2: 'outcome' } }
-    idolOutcomes: { idol1: null, idol2: null }, // set by admin when resolved
-    soleSurvivor: null,    // contestantId once crowned
-    draftPicks: {},        // { playerName: [contestantId, ...] }
-    scores: {},            // { playerName: { draft: N, prediction: N } }
+    winnerPredictions: {},
+    idolPredictions: {},
+    idolOutcomes: { idol1: null, idol2: null },
+    soleSurvivor: null,
+    draftPicks: {},
+    scores: {},
   };
 }
 
-let state = loadState();
+function showLoader(msg) {
+  document.getElementById('app-loader').style.display = 'flex';
+  document.getElementById('app-loader-msg').textContent = msg || 'Loading...';
+}
+
+function hideLoader() {
+  document.getElementById('app-loader').style.display = 'none';
+}
+
+function showSyncing() {
+  document.getElementById('sync-indicator').style.opacity = '1';
+}
+
+function hideSyncing() {
+  document.getElementById('sync-indicator').style.opacity = '0';
+}
+
+async function initApp() {
+  showLoader('Loading pool data... 🔥');
+  try {
+    if (blobId) {
+      // Load from shared blob
+      const res = await fetch(`${JSONBLOB_API}/${blobId}`, {
+        headers: { 'Accept': 'application/json' }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        state = data._version === STATE_VERSION ? data : migrateState(data);
+      } else if (res.status === 404) {
+        // Blob was deleted, create a new one
+        blobId = null;
+        localStorage.removeItem('survivor50_blobId');
+        await createBlob();
+      }
+    } else {
+      await createBlob();
+    }
+  } catch(e) {
+    console.error('Failed to load from JSONBlob:', e);
+    toast('⚠️ Could not reach server — showing local data');
+    state = getDefaultState();
+  }
+  hideLoader();
+  renderLeaderboard();
+  // Poll for updates every 15 seconds
+  setInterval(pollForUpdates, 15000);
+}
+
+async function createBlob() {
+  try {
+    const res = await fetch(JSONBLOB_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(state)
+    });
+    if (res.ok) {
+      const location = res.headers.get('Location') || res.url;
+      blobId = location.split('/').pop();
+      localStorage.setItem('survivor50_blobId', blobId);
+      console.log('Created blob:', blobId);
+    }
+  } catch(e) {
+    console.error('Failed to create blob:', e);
+  }
+}
+
+async function pollForUpdates() {
+  if (!blobId) return;
+  try {
+    const res = await fetch(`${JSONBLOB_API}/${blobId}`, {
+      headers: { 'Accept': 'application/json' }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (JSON.stringify(data) !== JSON.stringify(state)) {
+        state = data;
+        // Re-render the active panel
+        const activePanel = document.querySelector('.panel.active')?.id;
+        if (activePanel === 'leaderboard') renderLeaderboard();
+        if (activePanel === 'cast') renderCast();
+        if (activePanel === 'predictions') renderPredictions();
+      }
+    }
+  } catch(e) { /* silent fail on poll */ }
+}
+
+function migrateState(raw) {
+  const fresh = getDefaultState();
+  fresh.players = raw.players || [];
+  fresh.draftPicks = raw.draftPicks || {};
+  fresh.winnerPredictions = raw.winnerPredictions || {};
+  fresh.idolPredictions = raw.idolPredictions || {};
+  fresh.idolOutcomes = raw.idolOutcomes || { idol1: null, idol2: null };
+  fresh.entryFee = raw.entryFee || 20;
+  fresh.adminPassword = raw.adminPassword || 'torch';
+  fresh.scores = raw.scores || {};
+  fresh.soleSurvivor = raw.soleSurvivor || null;
+  fresh.eliminations = raw.eliminations || fresh.eliminations;
+  fresh.currentWeek = raw.currentWeek || 3;
+  return fresh;
+}
 
 function saveState() {
   state._version = STATE_VERSION;
-  localStorage.setItem('survivor50_state', JSON.stringify(state));
+  // Debounce saves — wait 600ms after last change before pushing
+  clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(pushState, 600);
+}
+
+async function pushState() {
+  if (!blobId) { await createBlob(); return; }
+  showSyncing();
+  try {
+    const res = await fetch(`${JSONBLOB_API}/${blobId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(state)
+    });
+    if (!res.ok) throw new Error('Save failed');
+  } catch(e) {
+    console.error('Failed to save:', e);
+    toast('⚠️ Save failed — check connection');
+  } finally {
+    hideSyncing();
+  }
 }
 
 // ==================== UTIL ====================
@@ -1107,8 +1232,10 @@ function renderCast() {
 
 // ==================== PREDICTIONS ====================
 const IDOL_OUTCOMES = [
-  { value: 'recipient_plays', label: 'Boomerang recipient plays the idol' },
-  { value: 'boomerangs_back', label: 'Idol boomerangs back to original finder' },
+  { value: 'played_successfully', label: 'Played successfully (saves someone)' },
+  { value: 'voted_out_holding',   label: 'Holder gets voted out with it (boomerangs back)' },
+  { value: 'finder_gets_back_plays', label: 'Boomerangs back & finder plays it' },
+  { value: 'expires_unused',      label: 'Expires unused at Final 5' },
 ];
 
 function idolOutcomeLabel(val) {
@@ -1250,7 +1377,10 @@ function showAdminPanel() {
   if (io.idol1) document.getElementById('idol1-outcome').value = io.idol1;
   if (io.idol2) document.getElementById('idol2-outcome').value = io.idol2;
   renderDraftAssignments();
-  // Populate advantage player dropdown
+  // Show blob ID
+  const blobDisplay = document.getElementById('blob-id-display');
+  if (blobDisplay) blobDisplay.textContent = blobId || 'Not connected';
+
   const advSel = document.getElementById("adv-player");
   if (advSel) {
     advSel.innerHTML = '<option value="">Select pool player...</option>' +
@@ -1386,6 +1516,37 @@ function lockDraftPicks(player) {
 }
 
 
+function copyBlobId() {
+  if (!blobId) { toast('No blob ID yet!'); return; }
+  navigator.clipboard.writeText(blobId).then(() => toast('Blob ID copied! 📋'));
+}
+
+async function connectBlob() {
+  const input = document.getElementById('blob-id-input').value.trim();
+  if (!input) { toast('Paste a blob ID first'); return; }
+  showLoader('Connecting to shared pool...');
+  try {
+    const res = await fetch(`${JSONBLOB_API}/${input}`, {
+      headers: { 'Accept': 'application/json' }
+    });
+    if (res.ok) {
+      blobId = input;
+      localStorage.setItem('survivor50_blobId', blobId);
+      state = await res.json();
+      hideLoader();
+      toast('Connected! 🎉 Pool data loaded.');
+      renderLeaderboard();
+      showAdminPanel();
+    } else {
+      hideLoader();
+      toast('Blob ID not found — double check it');
+    }
+  } catch(e) {
+    hideLoader();
+    toast('Connection failed — check the ID');
+  }
+}
+
 function resolveIdols() {
   const i1 = document.getElementById('idol1-outcome').value;
   const i2 = document.getElementById('idol2-outcome').value;
@@ -1433,7 +1594,7 @@ function confirmReset() {
 }
 
 // ==================== INIT ====================
-renderLeaderboard();
+initApp();
 </script>
 </body>
 </html>
