@@ -1601,6 +1601,128 @@ function confirmReset() {
   }
 }
 
+  // ==================== RECORD EPISODE ====================
+function getDraftedContestants() {
+  const allDrafted = [];
+  state.players.forEach(player => {
+    (state.draftPicks[player] || []).forEach(cid => {
+      const c = getContestant(cid);
+      if (c && c.alive) allDrafted.push({ ...c, poolPlayer: player });
+    });
+  });
+  return allDrafted;
+}
+
+function checkboxList(contestants, prefix) {
+  if (contestants.length === 0) return '<div style="font-size:0.75rem;color:var(--muted);padding:0.3rem 0">No drafted contestants alive</div>';
+  return contestants.map(c => `
+    <label style="display:flex;align-items:center;gap:0.5rem;padding:0.25rem 0;font-size:0.8rem;color:var(--text);cursor:pointer">
+      <input type="checkbox" id="${prefix}-${c.id}" value="${c.id}" style="accent-color:var(--ember)">
+      ${c.emoji} ${c.name} <span style="color:var(--muted);font-size:0.7rem">(${c.poolPlayer})</span>
+    </label>`).join('');
+}
+
+function renderEpisodeForm() {
+  const drafted = getDraftedContestants();
+  const aliveAll = state.cast.filter(c => c.alive);
+  const bootSel = document.getElementById('ep-boot');
+  if (bootSel) {
+    bootSel.innerHTML = '<option value="">— Nobody / skip —</option>' +
+      aliveAll.map(c => `<option value="${c.id}">${c.emoji} ${c.name}</option>`).join('');
+  }
+  const lists = ['ep-immunity-list', 'ep-found-list', 'ep-played-list', 'ep-title-list'];
+  const prefixes = ['imm', 'found', 'played', 'title'];
+  lists.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = checkboxList(drafted, prefixes[i]);
+  });
+}
+
+function getChecked(prefix) {
+  return Array.from(document.querySelectorAll(`input[id^="${prefix}-"]:checked`))
+    .map(cb => parseInt(cb.value));
+}
+
+function previewEpisode() {
+  const week = parseInt(document.getElementById('ep-week').value);
+  if (isNaN(week) || week < 1) { toast('Enter a valid week number'); return; }
+  const bootId = parseInt(document.getElementById('ep-boot').value) || null;
+  const bootType = document.getElementById('ep-boot-type').value;
+  const immunity = getChecked('imm');
+  const found = getChecked('found');
+  const played = getChecked('played');
+  const title = getChecked('title');
+  const bootC = bootId ? getContestant(bootId) : null;
+  const drafted = getDraftedContestants();
+  const lines = [];
+  lines.push(`<div style="margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid rgba(255,255,255,0.07)"><strong style="color:var(--gold);font-family:'Cinzel',serif">Week ${week}</strong></div>`);
+  if (bootC) {
+    const isMedevac = bootType === 'medevac';
+    lines.push(`🪦 <strong>${bootC.name}</strong> ${isMedevac ? 'medevac/quit' : 'voted out'}`);
+    if (!isMedevac) {
+      const survivors = drafted.filter(c => c.id !== bootId);
+      if (survivors.length > 0) {
+        lines.push(`&nbsp;&nbsp;+5 survival pts → ${survivors.map(c => `<strong>${c.name}</strong> (${c.poolPlayer})`).join(', ')}`);
+      }
+    }
+  } else {
+    lines.push(`🪦 No elimination this episode`);
+  }
+  immunity.forEach(id => {
+    const c = getContestant(id);
+    const owner = state.players.find(p => (state.draftPicks[p]||[]).includes(id));
+    lines.push(`🏆 <strong>${c?.name}</strong> won immunity → +3 pts to <strong>${owner}</strong>`);
+  });
+  found.forEach(id => {
+    const c = getContestant(id);
+    const owner = state.players.find(p => (state.draftPicks[p]||[]).includes(id));
+    lines.push(`🔍 <strong>${c?.name}</strong> found idol/advantage → +5 pts to <strong>${owner}</strong>`);
+  });
+  played.forEach(id => {
+    const c = getContestant(id);
+    const owner = state.players.find(p => (state.draftPicks[p]||[]).includes(id));
+    lines.push(`⚡ <strong>${c?.name}</strong> played idol/advantage → +5 pts to <strong>${owner}</strong>`);
+  });
+  title.forEach(id => {
+    const c = getContestant(id);
+    const owner = state.players.find(p => (state.draftPicks[p]||[]).includes(id));
+    lines.push(`🗣 <strong>${c?.name}</strong> said the episode title → +10 pts to <strong>${owner}</strong>`);
+  });
+  window._pendingEpisode = { week, bootId, bootType, immunity, found, played, title };
+  document.getElementById('ep-summary-content').innerHTML = lines.join('<br>');
+  document.getElementById('ep-summary-modal').style.display = 'flex';
+}
+
+function applyEpisode() {
+  const ep = window._pendingEpisode;
+  if (!ep) return;
+  const { week, bootId, bootType, immunity, found, played, title } = ep;
+  const isMedevac = bootType === 'medevac';
+  if (bootId) {
+    state.eliminations.push({ week, contestantId: bootId, idolPlayed: false, isMedevac });
+    const c = getContestant(bootId);
+    if (c) c.alive = false;
+  }
+  function awardBonus(cid, pts) {
+    const owner = state.players.find(p => (state.draftPicks[p]||[]).includes(cid));
+    if (!owner) return;
+    if (!state.scores[owner]) state.scores[owner] = { draft: 0, prediction: 0, bonus: 0 };
+    state.scores[owner].bonus = (state.scores[owner].bonus || 0) + pts;
+  }
+  immunity.forEach(cid => awardBonus(cid, 3));
+  found.forEach(cid => awardBonus(cid, 5));
+  played.forEach(cid => awardBonus(cid, 5));
+  title.forEach(cid => awardBonus(cid, 10));
+  recalcScores();
+  saveState();
+  document.getElementById('ep-summary-modal').style.display = 'none';
+  document.getElementById('ep-week').value = '';
+  renderEpisodeForm();
+  populateElimSelect();
+  toast(`Week ${week} recorded! Points applied 🔥`);
+  window._pendingEpisode = null;
+}
+
 // ==================== INIT ====================
 initApp();
 </script>
