@@ -803,7 +803,6 @@
           <h3>🏅 Draft Assignment</h3>
           <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem">Assign contestants to players for the draft.</p>
           <div id="draft-assignments"></div>
-          <button class="btn btn-ghost" onclick="renderDraftAssignments()" style="margin-top:0.5rem;font-size:0.65rem">Refresh</button>
         </div>
 
         <div class="admin-card">
@@ -1332,37 +1331,67 @@ function renderDraftAssignments() {
 
   container.innerHTML = state.players.map(player => {
     const picked = state.draftPicks[player] || [];
-    const aliveContestants = state.cast.filter(c => c.alive);
-    const unowned = state.cast.filter(c => {
-      const ownerExists = state.players.some(p => (state.draftPicks[p]||[]).includes(c.id));
-      return !ownerExists || (state.draftPicks[player]||[]).includes(c.id);
-    });
+    const locked = picked.length > 0;
 
-    const options = state.cast.map(c => {
-      const ownerExists = state.players.some(p => p !== player && (state.draftPicks[p]||[]).includes(c.id));
-      return `<option value="${c.id}" ${picked.includes(c.id)?'selected':''} ${ownerExists?'disabled':''}>
-        ${c.name}${ownerExists?' (taken)':''}${!c.alive?' ✗':''}
-      </option>`;
+    const checkboxes = state.cast.map(c => {
+      const takenByOther = state.players.some(p => p !== player && (state.draftPicks[p]||[]).includes(c.id));
+      const isChecked = picked.includes(c.id);
+      const disabled = takenByOther ? 'disabled' : '';
+      const label = `${c.emoji} ${c.name}${!c.alive ? ' ✗' : ''}${takenByOther ? ' (taken)' : ''}`;
+      return `<label style="display:flex;align-items:center;gap:0.5rem;padding:0.3rem 0;font-size:0.8rem;color:${takenByOther ? 'var(--muted)' : !c.alive ? '#888' : 'var(--text)'};cursor:${takenByOther ? 'default' : 'pointer'}">
+        <input type="checkbox" value="${c.id}" ${isChecked ? 'checked' : ''} ${disabled} onchange="validateDraftCheckbox('${player}', this)" style="accent-color:var(--ember)">
+        ${label}
+      </label>`;
     }).join('');
 
-    return `<div style="margin-bottom:1rem">
-      <label style="font-size:0.7rem;font-family:'Cinzel',serif;color:var(--muted);letter-spacing:0.1em;display:block;margin-bottom:0.4rem">${player}</label>
-      <select multiple style="width:100%;background:var(--surface);border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:0.4rem;font-size:0.8rem;border-radius:2px;height:80px" onchange="updateDraftPick('${player}', this)">
-        ${options}
-      </select>
+    return `<div style="margin-bottom:1.5rem;padding:1rem;background:rgba(255,255,255,0.03);border-radius:4px;border:1px solid rgba(255,255,255,0.07)" id="draft-player-${player.replace(/\s/g,'_')}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem">
+        <span style="font-size:0.75rem;font-family:'Cinzel',serif;color:var(--gold);letter-spacing:0.1em">${player}</span>
+        <span style="font-size:0.7rem;color:var(--muted)" id="count-${player.replace(/\s/g,'_')}">
+          ${picked.length}/5 selected
+        </span>
+      </div>
+      <div style="max-height:220px;overflow-y:auto;margin-bottom:0.8rem">${checkboxes}</div>
+      <button class="btn ${locked ? 'btn-ghost' : ''}" onclick="lockDraftPicks('${player}')" style="width:100%;font-size:0.8rem">
+        ${locked ? '✅ Locked In — Update' : '🔒 Lock In Picks'}
+      </button>
     </div>`;
   }).join('');
 }
 
-function updateDraftPick(player, sel) {
-  const selected = Array.from(sel.selectedOptions).map(o => parseInt(o.value));
-  state.draftPicks[player] = selected;
-  saveState();
-  recalcScores();
-  toast(`Draft picks updated for ${player}`);
+function validateDraftCheckbox(player, checkbox) {
+  const playerKey = player.replace(/\s/g, '_');
+  const container = document.getElementById(`draft-player-${playerKey}`);
+  const checked = Array.from(container.querySelectorAll('input[type=checkbox]:checked'));
+  if (checked.length > 5) {
+    checkbox.checked = false;
+    toast('Max 5 picks per player!');
+    return;
+  }
+  document.getElementById(`count-${playerKey}`).textContent = `${checked.length}/5 selected`;
 }
 
+function lockDraftPicks(player) {
+  const playerKey = player.replace(/\s/g, '_');
+  const container = document.getElementById(`draft-player-${playerKey}`);
+  const checked = Array.from(container.querySelectorAll('input[type=checkbox]:checked'));
+  if (checked.length === 0) { toast('Select at least one pick!'); return; }
+  if (checked.length > 5) { toast('Max 5 picks per player!'); return; }
+  state.draftPicks[player] = checked.map(cb => parseInt(cb.value));
+  saveState();
+  recalcScores();
+  renderDraftAssignments();
+  toast(`${player}'s ${checked.length} picks locked in! 🔒`);
+}
+```
 
+Also change the draft card description line from:
+```
+Assign contestants to players for the draft.
+```
+to:
+```
+Check up to 5 picks per player, then click Lock In.
 function resolveIdols() {
   const i1 = document.getElementById('idol1-outcome').value;
   const i2 = document.getElementById('idol2-outcome').value;
