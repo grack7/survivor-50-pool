@@ -847,20 +847,16 @@
             <label>Idol 1 · Genevieve → Ozzy</label>
             <select id="idol1-outcome">
               <option value="">Select outcome...</option>
-              <option value="played_successfully">Played successfully (saves someone)</option>
-              <option value="voted_out_holding">Holder voted out holding it (boomerangs)</option>
-              <option value="finder_gets_back_plays">Boomerangs back & finder plays it</option>
-              <option value="expires_unused">Expires unused at Final 5</option>
+            <option value="recipient_plays">Boomerang recipient plays the idol</option>
+            <option value="boomerangs_back">Idol boomerangs back to original finder</option>
             </select>
           </div>
           <div class="form-group">
             <label>Idol 2 · Christian → Aubry</label>
             <select id="idol2-outcome">
               <option value="">Select outcome...</option>
-              <option value="played_successfully">Played successfully (saves someone)</option>
-              <option value="voted_out_holding">Holder voted out holding it (boomerangs)</option>
-              <option value="finder_gets_back_plays">Boomerangs back & finder plays it</option>
-              <option value="expires_unused">Expires unused at Final 5</option>
+            <option value="recipient_plays">Boomerang recipient plays the idol</option>
+            <option value="boomerangs_back">Idol boomerangs back to original finder</option>
             </select>
           </div>
           <button class="btn" onclick="resolveIdols()">Save Outcomes</button>
@@ -1111,10 +1107,8 @@ function renderCast() {
 
 // ==================== PREDICTIONS ====================
 const IDOL_OUTCOMES = [
-  { value: 'played_successfully', label: 'Played successfully (saves someone)' },
-  { value: 'voted_out_holding',   label: 'Holder gets voted out with it (boomerangs back)' },
-  { value: 'finder_gets_back_plays', label: 'Boomerangs back & finder plays it' },
-  { value: 'expires_unused',      label: 'Expires unused at Final 5' },
+  { value: 'recipient_plays', label: 'Boomerang recipient plays the idol' },
+  { value: 'boomerangs_back', label: 'Idol boomerangs back to original finder' },
 ];
 
 function idolOutcomeLabel(val) {
