@@ -761,14 +761,8 @@
 
         <div class="admin-card">
           <h3>🌐 Shared Backend</h3>
-          <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem">Your pool data is stored in the cloud. Everyone on the same device/browser shares the same blob automatically via this site's URL.</p>
-          <div style="font-size:0.7rem;color:var(--muted);font-family:'Cinzel',serif;letter-spacing:0.1em;margin-bottom:0.4rem;text-transform:uppercase">Blob ID</div>
-          <div id="blob-id-display" style="font-size:0.75rem;color:var(--text);background:var(--surface);padding:0.5rem 0.75rem;border-radius:2px;word-break:break-all;margin-bottom:0.75rem;border:1px solid rgba(255,255,255,0.08)">Loading...</div>
-          <button class="btn btn-ghost" style="font-size:0.65rem;width:100%;margin-bottom:0.5rem" onclick="copyBlobId()">Copy Blob ID</button>
-          <button class="btn" style="font-size:0.65rem;width:100%;margin-bottom:1rem" onclick="manualCreateBlob()">Create New Blob</button>
-          <div style="margin-top:1rem;font-size:0.7rem;color:var(--muted);font-family:'Cinzel',serif;letter-spacing:0.1em;margin-bottom:0.4rem;text-transform:uppercase">Connect to existing blob</div>
-          <input type="text" id="blob-id-input" placeholder="Paste blob ID here" style="width:100%;background:var(--surface);border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:0.6rem 0.8rem;font-family:'Lato',sans-serif;font-size:0.85rem;border-radius:2px;outline:none;margin-bottom:0.5rem">
-          <button class="btn" style="font-size:0.65rem;width:100%" onclick="connectBlob()">Connect</button>
+          <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem">Data is stored in Firebase and shared in real-time with everyone. No setup needed — just share the site URL!</p>
+          <div id="sync-status" style="font-size:0.8rem;color:#6DC96D;font-family:'Cinzel',serif;letter-spacing:0.1em">● Connected to Firebase</div>
         </div>
 
         <div class="admin-card">
@@ -945,10 +939,9 @@ const DEFAULT_CAST = [
 const TRIBE_NAMES = { cila: "Cila 🟠", kalo: "Kalo 🩵", vatu: "Vatu 💜", merged: "Merged ⭐" };
 
 const STATE_VERSION = 4;
-const JSONBLOB_API = 'https://jsonblob.com/api/jsonBlob';
+const FIREBASE_URL = 'https://survivor50-pool-69fcf-default-rtdb.firebaseio.com/state.json';
 
 let state = getDefaultState();
-let blobId = localStorage.getItem('survivor50_blobId') || null;
 let saveTimeout = null;
 
 function getDefaultState() {
@@ -993,70 +986,42 @@ function hideSyncing() {
 async function initApp() {
   showLoader('Loading pool data... 🔥');
   try {
-    if (blobId) {
-      // Load from shared blob
-      const res = await fetch(`${JSONBLOB_API}/${blobId}`, {
-        headers: { 'Accept': 'application/json' }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        state = data._version === STATE_VERSION ? data : migrateState(data);
-      } else if (res.status === 404) {
-        // Blob was deleted, create a new one
-        blobId = null;
-        localStorage.removeItem('survivor50_blobId');
-        await createBlob();
+    const res = await fetch(FIREBASE_URL);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data._version === STATE_VERSION) {
+        state = data;
+      } else if (data) {
+        state = migrateState(data);
+        await pushState();
+      } else {
+        // First time — push default state
+        await pushState();
       }
-    } else {
-      await createBlob();
     }
   } catch(e) {
-    console.error('Failed to load from JSONBlob:', e);
-    toast('⚠️ Could not reach server — showing local data');
-    state = getDefaultState();
+    console.error('Failed to load from Firebase:', e);
+    toast('⚠️ Could not reach server');
   }
   hideLoader();
   renderLeaderboard();
-  // Poll for updates every 15 seconds
   setInterval(pollForUpdates, 15000);
 }
 
-async function createBlob() {
-  try {
-    const res = await fetch(JSONBLOB_API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify(state)
-    });
-    if (res.ok) {
-      const location = res.headers.get('Location') || res.url;
-      blobId = location.split('/').pop();
-      localStorage.setItem('survivor50_blobId', blobId);
-      console.log('Created blob:', blobId);
-    }
-  } catch(e) {
-    console.error('Failed to create blob:', e);
-  }
-}
-
 async function pollForUpdates() {
-  if (!blobId) return;
   try {
-    const res = await fetch(`${JSONBLOB_API}/${blobId}`, {
-      headers: { 'Accept': 'application/json' }
-    });
+    const res = await fetch(FIREBASE_URL);
     if (res.ok) {
       const data = await res.json();
-      if (JSON.stringify(data) !== JSON.stringify(state)) {
+      if (data && JSON.stringify(data) !== JSON.stringify(state)) {
         state = data;
-        // Re-render the active panel
         const activePanel = document.querySelector('.panel.active')?.id;
         if (activePanel === 'leaderboard') renderLeaderboard();
         if (activePanel === 'cast') renderCast();
         if (activePanel === 'predictions') renderPredictions();
       }
     }
-  } catch(e) { /* silent fail on poll */ }
+  } catch(e) { /* silent */ }
 }
 
 function migrateState(raw) {
@@ -1077,18 +1042,16 @@ function migrateState(raw) {
 
 function saveState() {
   state._version = STATE_VERSION;
-  // Debounce saves — wait 600ms after last change before pushing
   clearTimeout(saveTimeout);
   saveTimeout = setTimeout(pushState, 600);
 }
 
 async function pushState() {
-  if (!blobId) { await createBlob(); return; }
   showSyncing();
   try {
-    const res = await fetch(`${JSONBLOB_API}/${blobId}`, {
+    const res = await fetch(FIREBASE_URL, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(state)
     });
     if (!res.ok) throw new Error('Save failed');
@@ -1378,9 +1341,6 @@ function showAdminPanel() {
   if (io.idol1) document.getElementById('idol1-outcome').value = io.idol1;
   if (io.idol2) document.getElementById('idol2-outcome').value = io.idol2;
   renderDraftAssignments();
-  // Show blob ID
-  const blobDisplay = document.getElementById('blob-id-display');
-  if (blobDisplay) blobDisplay.textContent = blobId || 'Not connected';
 
   const advSel = document.getElementById("adv-player");
   if (advSel) {
@@ -1517,50 +1477,6 @@ function lockDraftPicks(player) {
 }
 
 
-async function manualCreateBlob() {
-  showLoader('Creating shared blob... 🔥');
-  blobId = null;
-  localStorage.removeItem('survivor50_blobId');
-  await createBlob();
-  hideLoader();
-  if (blobId) {
-    toast('Blob created! Share the ID with your group 🎉');
-    showAdminPanel();
-  } else {
-    toast('Failed — check your connection');
-  }
-}
-
-function copyBlobId() {
-  if (!blobId) { toast('No blob ID yet!'); return; }
-  navigator.clipboard.writeText(blobId).then(() => toast('Blob ID copied! 📋'));
-}
-
-async function connectBlob() {
-  const input = document.getElementById('blob-id-input').value.trim();
-  if (!input) { toast('Paste a blob ID first'); return; }
-  showLoader('Connecting to shared pool...');
-  try {
-    const res = await fetch(`${JSONBLOB_API}/${input}`, {
-      headers: { 'Accept': 'application/json' }
-    });
-    if (res.ok) {
-      blobId = input;
-      localStorage.setItem('survivor50_blobId', blobId);
-      state = await res.json();
-      hideLoader();
-      toast('Connected! 🎉 Pool data loaded.');
-      renderLeaderboard();
-      showAdminPanel();
-    } else {
-      hideLoader();
-      toast('Blob ID not found — double check it');
-    }
-  } catch(e) {
-    hideLoader();
-    toast('Connection failed — check the ID');
-  }
-}
 
 function resolveIdols() {
   const i1 = document.getElementById('idol1-outcome').value;
