@@ -689,7 +689,7 @@
           <tr>
             <th>#</th>
             <th>Player</th>
-            <th>Draft Picks</th>
+           <th style="max-width:300px">Draft Picks</th>
             <th>Winner Pick</th>
             <th style="text-align:right">Score</th>
           </tr>
@@ -1241,7 +1241,7 @@ const sorted = [...state.players].sort((a, b) => {
         <td class="rank ${rankClass}">${rankSymbol}</td>
         <td>
           <div class="player-name">${player}</div>
-          <div class="player-picks">${picks || '<span style="color:var(--muted);font-size:0.7rem">No draft picks</span>'}</div>
+         <div class="player-picks" style="max-width:300px">${picks || '<span style="color:var(--muted);font-size:0.7rem">No draft picks</span>'}</div>
         </td>
       <td>${predDisplay}</td>
       <td class="score-cell">${total}</td>
