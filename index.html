@@ -766,16 +766,15 @@
       <input type="number" id="ep-week" placeholder="e.g. 4" min="1" max="15" style="width:100%;background:var(--surface);border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:0.6rem 0.8rem;font-family:'Lato',sans-serif;font-size:0.85rem;border-radius:2px;outline:none">
     </div>
 
-    <div>
-      <div style="font-size:0.7rem;font-family:'Cinzel',serif;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem">Voted Out / Medevac</div>
-      <select id="ep-boot" style="width:100%;background:var(--surface);border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:0.6rem 0.8rem;font-family:'Lato',sans-serif;font-size:0.85rem;border-radius:2px;outline:none;margin-bottom:0.4rem">
-        <option value="">— Nobody / skip —</option>
-      </select>
-      <select id="ep-boot-type" style="width:100%;background:var(--surface);border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:0.6rem 0.8rem;font-family:'Lato',sans-serif;font-size:0.85rem;border-radius:2px;outline:none">
-        <option value="voted">Voted out</option>
-        <option value="medevac">Medevac / quit (no survival pts)</option>
-      </select>
-    </div>
+   <div>
+  <div style="font-size:0.7rem;font-family:'Cinzel',serif;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem">Voted Out / Medevac</div>
+  <div id="ep-boot-list" style="max-height:160px;overflow-y:auto;background:var(--surface);border:1px solid rgba(255,255,255,0.1);border-radius:2px;padding:0.4rem 0.6rem;margin-bottom:0.4rem"></div>
+  <select id="ep-boot-type" style="width:100%;background:var(--surface);border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:0.6rem 0.8rem;font-family:'Lato',sans-serif;font-size:0.85rem;border-radius:2px;outline:none">
+    <option value="voted">Voted out</option>
+    <option value="medevac">Medevac / quit (no survival pts)</option>
+  </select>
+  <div style="font-size:0.65rem;color:var(--muted);margin-top:0.3rem;font-style:italic">Check all who were eliminated</div>
+</div>
 
     <div>
       <div style="font-size:0.7rem;font-family:'Cinzel',serif;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem">Won Immunity <span style="color:var(--muted)">(+3 pts)</span></div>
@@ -1618,11 +1617,14 @@ function checkboxList(contestants, prefix) {
 function renderEpisodeForm() {
   const drafted = getDraftedContestants();
   const aliveAll = state.cast.filter(c => c.alive);
-  const bootSel = document.getElementById('ep-boot');
-  if (bootSel) {
-    bootSel.innerHTML = '<option value="">— Nobody / skip —</option>' +
-      aliveAll.map(c => `<option value="${c.id}">${c.emoji} ${c.name}</option>`).join('');
-  }
+  const bootList = document.getElementById('ep-boot-list');
+if (bootList) {
+  bootList.innerHTML = aliveAll.map(c => `
+    <label style="display:flex;align-items:center;gap:0.5rem;padding:0.25rem 0;font-size:0.8rem;color:var(--text);cursor:pointer">
+      <input type="checkbox" id="boot-${c.id}" value="${c.id}" style="accent-color:var(--ember)">
+      ${c.emoji} ${c.name}
+    </label>`).join('');
+}
   const lists = ['ep-immunity-list', 'ep-found-list', 'ep-played-list', 'ep-title-list'];
   const prefixes = ['imm', 'found', 'played', 'title'];
   lists.forEach((id, i) => {
@@ -1639,8 +1641,8 @@ function getChecked(prefix) {
 function previewEpisode() {
   const week = parseInt(document.getElementById('ep-week').value);
   if (isNaN(week) || week < 1) { toast('Enter a valid week number'); return; }
-  const bootId = parseInt(document.getElementById('ep-boot').value) || null;
-  const bootType = document.getElementById('ep-boot-type').value;
+  const bootIds = Array.from(document.querySelectorAll('input[id^="boot-"]:checked')).map(cb => parseInt(cb.value));
+const bootType = document.getElementById('ep-boot-type').value;
   const immunity = getChecked('imm');
   const found = getChecked('found');
   const played = getChecked('played');
@@ -1649,18 +1651,21 @@ function previewEpisode() {
   const drafted = getDraftedContestants();
   const lines = [];
   lines.push(`<div style="margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid rgba(255,255,255,0.07)"><strong style="color:var(--gold);font-family:'Cinzel',serif">Week ${week}</strong></div>`);
-  if (bootC) {
-    const isMedevac = bootType === 'medevac';
+ if (bootIds.length > 0) {
+  const isMedevac = bootType === 'medevac';
+  bootIds.forEach(bootId => {
+    const bootC = getContestant(bootId);
     lines.push(`🪦 <strong>${bootC.name}</strong> ${isMedevac ? 'medevac/quit' : 'voted out'}`);
-    if (!isMedevac) {
-      const survivors = drafted.filter(c => c.id !== bootId);
-      if (survivors.length > 0) {
-        lines.push(`&nbsp;&nbsp;+5 survival pts → ${survivors.map(c => `<strong>${c.name}</strong> (${c.poolPlayer})`).join(', ')}`);
-      }
+  });
+  if (!isMedevac) {
+    const survivors = drafted.filter(c => !bootIds.includes(c.id));
+    if (survivors.length > 0) {
+      lines.push(`&nbsp;&nbsp;+5 survival pts → ${survivors.map(c => `<strong>${c.name}</strong> (${c.poolPlayer})`).join(', ')}`);
     }
-  } else {
-    lines.push(`🪦 No elimination this episode`);
   }
+} else {
+  lines.push(`🪦 No elimination this episode`);
+}
   immunity.forEach(id => {
     const c = getContestant(id);
     const owner = state.players.find(p => (state.draftPicks[p]||[]).includes(id));
@@ -1681,7 +1686,7 @@ function previewEpisode() {
     const owner = state.players.find(p => (state.draftPicks[p]||[]).includes(id));
     lines.push(`🗣 <strong>${c?.name}</strong> said the episode title → +10 pts to <strong>${owner}</strong>`);
   });
-  window._pendingEpisode = { week, bootId, bootType, immunity, found, played, title };
+window._pendingEpisode = { week, bootIds, bootType, immunity, found, played, title };
   document.getElementById('ep-summary-content').innerHTML = lines.join('<br>');
   document.getElementById('ep-summary-modal').style.display = 'flex';
 }
@@ -1689,13 +1694,13 @@ function previewEpisode() {
 function applyEpisode() {
   const ep = window._pendingEpisode;
   if (!ep) return;
-  const { week, bootId, bootType, immunity, found, played, title } = ep;
-  const isMedevac = bootType === 'medevac';
-  if (bootId) {
-    state.eliminations.push({ week, contestantId: bootId, idolPlayed: false, isMedevac });
-    const c = getContestant(bootId);
-    if (c) c.alive = false;
-  }
+ const { week, bootIds, bootType, immunity, found, played, title } = ep;
+const isMedevac = bootType === 'medevac';
+bootIds.forEach(bootId => {
+  state.eliminations.push({ week, contestantId: bootId, idolPlayed: false, isMedevac });
+  const c = getContestant(bootId);
+  if (c) c.alive = false;
+});
   function awardBonus(cid, pts) {
     const owner = state.players.find(p => (state.draftPicks[p]||[]).includes(cid));
     if (!owner) return;
