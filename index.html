@@ -1227,8 +1227,9 @@ const sorted = [...state.players].sort((a, b) => {
 
     const predId = state.winnerPredictions[player];
     const predC = predId ? getContestant(predId) : null;
+    const predEliminated = predC && !predC.alive && !state.soleSurvivor;
     const predDisplay = predC
-      ? `<span style="color:${state.soleSurvivor===predId ? '#6DC96D' : state.soleSurvivor ? '#C96D6D' : 'var(--gold)'};font-family:'Cinzel',serif;font-size:0.8rem">${predC.emoji} ${predC.name}</span>`
+      ? `<span style="color:${state.soleSurvivor===predId ? '#6DC96D' : (!predC.alive || state.soleSurvivor) ? '#C96D6D' : 'var(--gold)'};font-family:'Cinzel',serif;font-size:0.8rem;${predEliminated ? 'text-decoration:line-through;opacity:0.6;' : ''}">${predC.emoji} ${predC.name}</span>`
       : `<span style="color:var(--muted);font-size:0.75rem;font-style:italic">not set</span>`;
 
     const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
