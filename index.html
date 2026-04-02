@@ -816,6 +816,19 @@
 </div>
 
         <div class="admin-card">
+  <h3>🏝 Record Milestone</h3>
+  <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem">Award one-time milestone bonuses to all surviving drafted contestants.</p>
+  <div class="form-group">
+    <label>Milestone</label>
+    <select id="milestone-type">
+      <option value="merge">Reached the Merge (+10 per surviving drafted player)</option>
+      <option value="final_tribal">Made Final Tribal Council (+15 per surviving drafted player)</option>
+    </select>
+  </div>
+  <button class="btn" onclick="recordMilestone()">Award Milestone</button>
+</div>
+
+        <div class="admin-card">
           <h3>🌐 Shared Backend</h3>
           <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem">Data is stored in Firebase and shared in real-time with everyone. No setup needed — just share the site URL!</p>
           <div id="sync-status" style="font-size:0.8rem;color:#6DC96D;font-family:'Cinzel',serif;letter-spacing:0.1em">● Connected to Firebase</div>
@@ -1719,6 +1732,24 @@ bootIds.forEach(bootId => {
   populateElimSelect();
   toast(`Week ${week} recorded! Points applied 🔥`);
   window._pendingEpisode = null;
+}
+
+  function recordMilestone() {
+  const type = document.getElementById('milestone-type').value;
+  const pts = type === 'merge' ? 10 : 15;
+  const label = type === 'merge' ? 'Merge' : 'Final Tribal';
+
+  const drafted = getDraftedContestants(); // only alive drafted players
+  if (drafted.length === 0) { toast('No surviving drafted contestants found'); return; }
+
+  drafted.forEach(c => {
+    const owner = c.poolPlayer;
+    if (!state.scores[owner]) state.scores[owner] = { draft: 0, prediction: 0, bonus: 0 };
+    state.scores[owner].bonus = (state.scores[owner].bonus || 0) + pts;
+  });
+
+  saveState();
+  toast(`${label} bonus awarded! +${pts} pts to ${drafted.length} contestants 🏝`);
 }
 
 // ==================== INIT ====================
