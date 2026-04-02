@@ -1,6 +1,5 @@
-<!DOCTYPE html>
-
-<html lang="en">
+can u give me a clean file im on my phone:
+<!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,10 +18,7 @@
     --text: #E8DCC8;
     --text-dim: #9E9080;
     --torch: #FF6B1A;
-  }
-
-- { margin: 0; padding: 0; box-sizing: border-box; }
-
+  }	∙	{ margin: 0; padding: 0; box-sizing: border-box; }
 body {
 background: var(–dark);
 color: var(–text);
@@ -30,7 +26,6 @@ font-family: ‘Lato’, sans-serif;
 min-height: 100vh;
 overflow-x: hidden;
 }
-
 /* Grain overlay */
 body::before {
 content: ‘’;
@@ -41,7 +36,6 @@ pointer-events: none;
 z-index: 9999;
 opacity: 0.4;
 }
-
 /* Ambient glow */
 body::after {
 content: ‘’;
@@ -55,7 +49,6 @@ background: radial-gradient(ellipse, rgba(232,83,10,0.08) 0%, transparent 70%);
 pointer-events: none;
 z-index: 0;
 }
-
 /* –– HEADER –– */
 header {
 text-align: center;
@@ -63,7 +56,6 @@ padding: 3rem 2rem 2rem;
 position: relative;
 border-bottom: 1px solid rgba(201,168,76,0.2);
 }
-
 .torch-left, .torch-right {
 position: absolute;
 top: 1rem;
@@ -72,12 +64,10 @@ animation: flicker 2s ease-in-out infinite alternate;
 }
 .torch-left { left: 2rem; }
 .torch-right { right: 2rem; animation-delay: 0.7s; }
-
 @keyframes flicker {
 0% { filter: brightness(1) drop-shadow(0 0 8px #FF6B1A); }
 100% { filter: brightness(1.3) drop-shadow(0 0 20px #FF6B1A); }
 }
-
 .season-label {
 font-family: ‘Cinzel’, serif;
 font-size: 0.7rem;
@@ -86,7 +76,6 @@ color: var(–gold);
 text-transform: uppercase;
 margin-bottom: 0.5rem;
 }
-
 h1 {
 font-family: ‘Cinzel Decorative’, serif;
 font-size: clamp(2rem, 6vw, 4rem);
@@ -99,7 +88,6 @@ line-height: 1.1;
 text-shadow: none;
 letter-spacing: 0.02em;
 }
-
 .subtitle {
 font-family: ‘Cinzel’, serif;
 font-size: 0.75rem;
@@ -108,7 +96,6 @@ color: var(–muted);
 margin-top: 0.5rem;
 text-transform: uppercase;
 }
-
 /* –– NAV TABS –– */
 nav {
 display: flex;
@@ -120,7 +107,6 @@ position: relative;
 z-index: 10;
 flex-wrap: wrap;
 }
-
 nav button {
 background: none;
 border: none;
@@ -135,13 +121,11 @@ transition: all 0.2s;
 border-bottom: 2px solid transparent;
 position: relative;
 }
-
 nav button:hover { color: var(–text); }
 nav button.active {
 color: var(–ember);
 border-bottom-color: var(–fire);
 }
-
 /* –– MAIN CONTENT –– */
 main {
 max-width: 1100px;
@@ -150,10 +134,8 @@ padding: 2rem 1.5rem;
 position: relative;
 z-index: 1;
 }
-
 .panel { display: none; }
 .panel.active { display: block; }
-
 /* –– LEADERBOARD –– */
 .pot-banner {
 background: linear-gradient(135deg, rgba(232,83,10,0.15), rgba(201,168,76,0.1));
@@ -167,7 +149,6 @@ margin-bottom: 2rem;
 flex-wrap: wrap;
 gap: 1rem;
 }
-
 .pot-label {
 font-family: ‘Cinzel’, serif;
 font-size: 0.65rem;
@@ -176,20 +157,17 @@ color: var(–muted);
 text-transform: uppercase;
 margin-bottom: 0.25rem;
 }
-
 .pot-amount {
 font-family: ‘Cinzel Decorative’, serif;
 font-size: 2.5rem;
 color: var(–gold);
 line-height: 1;
 }
-
 .pot-meta {
 text-align: right;
 font-size: 0.8rem;
 color: var(–text-dim);
 }
-
 .pot-meta span {
 display: block;
 font-family: ‘Cinzel’, serif;
@@ -199,13 +177,11 @@ color: var(–muted);
 margin-bottom: 0.2rem;
 text-transform: uppercase;
 }
-
 /* Leaderboard table */
 .lb-table {
 width: 100%;
 border-collapse: collapse;
 }
-
 .lb-table th {
 font-family: ‘Cinzel’, serif;
 font-size: 0.6rem;
@@ -216,46 +192,38 @@ padding: 0.75rem 1rem;
 text-align: left;
 border-bottom: 1px solid rgba(201,168,76,0.15);
 }
-
 .lb-table td {
 padding: 0.9rem 1rem;
 border-bottom: 1px solid rgba(255,255,255,0.04);
 font-size: 0.9rem;
 vertical-align: middle;
 }
-
 .lb-table tr:hover td { background: rgba(255,255,255,0.02); }
-
 .rank {
 font-family: ‘Cinzel’, serif;
 font-weight: 700;
 color: var(–muted);
 width: 40px;
 }
-
 .rank-1 { color: var(–gold); font-size: 1.1rem; }
 .rank-2 { color: #C0C0C0; }
 .rank-3 { color: #CD7F32; }
-
 .player-name {
 font-family: ‘Cinzel’, serif;
 font-weight: 600;
 font-size: 0.95rem;
 }
-
 .player-picks {
 font-size: 0.75rem;
 color: var(–text-dim);
 margin-top: 0.2rem;
 }
-
 .score-cell {
 font-family: ‘Cinzel Decorative’, serif;
 font-size: 1.4rem;
 color: var(–ember);
 text-align: right;
 }
-
 .alive-badge {
 display: inline-block;
 padding: 0.15rem 0.5rem;
@@ -267,17 +235,14 @@ text-transform: uppercase;
 margin-right: 0.3rem;
 margin-bottom: 0.2rem;
 }
-
 .alive-badge.alive { background: rgba(100,200,100,0.1); color: #6DC96D; border: 1px solid rgba(100,200,100,0.2); }
 .alive-badge.out { background: rgba(200,100,100,0.1); color: #C96D6D; border: 1px solid rgba(200,100,100,0.2); text-decoration: line-through; }
-
 /* –– CAST GRID –– */
 .cast-grid {
 display: grid;
 grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
 gap: 1rem;
 }
-
 .cast-card {
 background: var(–mid);
 border: 1px solid rgba(255,255,255,0.06);
@@ -288,13 +253,10 @@ transition: all 0.2s;
 position: relative;
 overflow: hidden;
 }
-
 .cast-card:hover { border-color: rgba(232,83,10,0.3); transform: translateY(-2px); }
-
 .cast-card.eliminated {
 opacity: 0.45;
 }
-
 .cast-card.eliminated::after {
 content: ‘VOTED OUT’;
 position: absolute;
@@ -310,7 +272,6 @@ padding: 0.2rem 0.5rem;
 white-space: nowrap;
 opacity: 0.9;
 }
-
 .cast-avatar {
 width: 56px;
 height: 56px;
@@ -324,7 +285,6 @@ font-family: ‘Cinzel’, serif;
 font-weight: 700;
 border: 2px solid rgba(201,168,76,0.3);
 }
-
 .cast-name {
 font-family: ‘Cinzel’, serif;
 font-size: 0.7rem;
@@ -332,21 +292,18 @@ font-weight: 600;
 letter-spacing: 0.05em;
 margin-bottom: 0.2rem;
 }
-
 .cast-tribe {
 font-size: 0.65rem;
 color: var(–text-dim);
 letter-spacing: 0.1em;
 text-transform: uppercase;
 }
-
 .cast-owner {
 font-size: 0.6rem;
 color: var(–gold);
 margin-top: 0.4rem;
 font-family: ‘Cinzel’, serif;
 }
-
 /* –– WEEKLY PICKS –– */
 .week-header {
 display: flex;
@@ -355,13 +312,11 @@ gap: 1rem;
 margin-bottom: 1.5rem;
 flex-wrap: wrap;
 }
-
 .week-title {
 font-family: ‘Cinzel Decorative’, serif;
 font-size: 1.3rem;
 color: var(–ember);
 }
-
 .week-status {
 font-size: 0.7rem;
 font-family: ‘Cinzel’, serif;
@@ -369,21 +324,18 @@ letter-spacing: 0.15em;
 color: var(–muted);
 text-transform: uppercase;
 }
-
 .picks-grid {
 display: grid;
 grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 gap: 1rem;
 margin-bottom: 2rem;
 }
-
 .pick-card {
 background: var(–mid);
 border: 1px solid rgba(255,255,255,0.07);
 border-radius: 4px;
 padding: 1.2rem;
 }
-
 .pick-card-name {
 font-family: ‘Cinzel’, serif;
 font-size: 0.8rem;
@@ -392,7 +344,6 @@ margin-bottom: 1rem;
 color: var(–text-dim);
 text-transform: uppercase;
 }
-
 .pick-select {
 width: 100%;
 background: var(–surface);
@@ -406,9 +357,7 @@ cursor: pointer;
 appearance: none;
 outline: none;
 }
-
 .pick-select:focus { border-color: var(–fire); }
-
 .pick-result {
 margin-top: 0.75rem;
 font-size: 0.75rem;
@@ -417,25 +366,21 @@ border-radius: 2px;
 font-family: ‘Cinzel’, serif;
 letter-spacing: 0.1em;
 }
-
 .pick-result.correct { background: rgba(100,200,100,0.1); color: #6DC96D; border: 1px solid rgba(100,200,100,0.2); }
 .pick-result.wrong { background: rgba(200,100,100,0.1); color: #C96D6D; border: 1px solid rgba(200,100,100,0.2); }
 .pick-result.pending { background: rgba(201,168,76,0.1); color: var(–gold); border: 1px solid rgba(201,168,76,0.2); }
-
 /* –– ADMIN –– */
 .admin-grid {
 display: grid;
 grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
 gap: 1.5rem;
 }
-
 .admin-card {
 background: var(–mid);
 border: 1px solid rgba(255,255,255,0.07);
 border-radius: 4px;
 padding: 1.5rem;
 }
-
 .admin-card h3 {
 font-family: ‘Cinzel’, serif;
 font-size: 0.75rem;
@@ -446,11 +391,9 @@ margin-bottom: 1.2rem;
 padding-bottom: 0.75rem;
 border-bottom: 1px solid rgba(201,168,76,0.15);
 }
-
 .form-group {
 margin-bottom: 1rem;
 }
-
 .form-group label {
 display: block;
 font-size: 0.7rem;
@@ -460,7 +403,6 @@ color: var(–muted);
 text-transform: uppercase;
 margin-bottom: 0.4rem;
 }
-
 .form-group input, .form-group select {
 width: 100%;
 background: var(–surface);
@@ -473,9 +415,7 @@ border-radius: 2px;
 outline: none;
 transition: border-color 0.2s;
 }
-
 .form-group input:focus, .form-group select:focus { border-color: var(–fire); }
-
 .btn {
 display: inline-block;
 background: linear-gradient(135deg, var(–fire), var(–ember));
@@ -490,22 +430,17 @@ cursor: pointer;
 border-radius: 2px;
 transition: all 0.2s;
 }
-
 .btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
 .btn:active { transform: translateY(0); }
-
 .btn-ghost {
 background: transparent;
 border: 1px solid rgba(255,255,255,0.15);
 color: var(–text-dim);
 }
-
 .btn-ghost:hover { border-color: var(–fire); color: var(–text); background: rgba(232,83,10,0.05); }
-
 .btn-danger {
 background: linear-gradient(135deg, #8B0000, #C0392B);
 }
-
 /* Section headings */
 .section-heading {
 font-family: ‘Cinzel’, serif;
@@ -518,14 +453,12 @@ display: flex;
 align-items: center;
 gap: 1rem;
 }
-
 .section-heading::after {
 content: ‘’;
 flex: 1;
 height: 1px;
 background: rgba(255,255,255,0.06);
 }
-
 /* Toast */
 .toast {
 position: fixed;
@@ -545,25 +478,20 @@ transform: translateY(10px);
 transition: all 0.3s;
 pointer-events: none;
 }
-
 .toast.show { opacity: 1; transform: translateY(0); }
-
 /* Tribe colors */
 .tribe-cila { color: #E07B2A; }
 .tribe-kalo { color: #3ABFBF; }
 .tribe-vatu { color: #C47FD4; }
 .tribe-merged { color: var(–gold); }
-
 /* Winner highlight */
 .winner-row td { background: rgba(201,168,76,0.05); }
-
 /* Points badge */
 .points-breakdown {
 font-size: 0.7rem;
 color: var(–text-dim);
 margin-top: 0.2rem;
 }
-
 /* Responsive */
 @media (max-width: 600px) {
 h1 { font-size: 1.8rem; }
@@ -571,40 +499,33 @@ nav button { padding: 0.75rem 0.8rem; font-size: 0.6rem; }
 .pot-banner { flex-direction: column; text-align: center; }
 .pot-meta { text-align: center; }
 }
-
 /* Entry animation */
 @keyframes fadeUp {
 from { opacity: 0; transform: translateY(16px); }
 to { opacity: 1; transform: translateY(0); }
 }
-
 .panel.active > * {
 animation: fadeUp 0.35s ease both;
 }
-
 .panel.active > *:nth-child(2) { animation-delay: 0.05s; }
 .panel.active > *:nth-child(3) { animation-delay: 0.1s; }
 .panel.active > *:nth-child(4) { animation-delay: 0.15s; }
-
 /* Admin password overlay */
 .admin-lock {
 text-align: center;
 padding: 4rem 2rem;
 }
-
 .admin-lock h2 {
 font-family: ‘Cinzel Decorative’, serif;
 color: var(–gold);
 margin-bottom: 0.5rem;
 font-size: 1.5rem;
 }
-
 .admin-lock p {
 color: var(–text-dim);
 margin-bottom: 2rem;
 font-size: 0.85rem;
 }
-
 .admin-lock input {
 background: var(–surface);
 border: 1px solid rgba(255,255,255,0.1);
@@ -619,10 +540,8 @@ letter-spacing: 0.3em;
 margin-right: 0.5rem;
 width: 180px;
 }
-
 /* Scroll hint */
 .scroll-hint { overflow-x: auto; }
-
 /* Week selector */
 .week-selector {
 display: flex;
@@ -630,7 +549,6 @@ gap: 0.5rem;
 flex-wrap: wrap;
 margin-bottom: 1.5rem;
 }
-
 .week-btn {
 background: var(–mid);
 border: 1px solid rgba(255,255,255,0.08);
@@ -643,33 +561,21 @@ cursor: pointer;
 border-radius: 2px;
 transition: all 0.2s;
 }
-
 .week-btn:hover, .week-btn.active { border-color: var(–fire); color: var(–ember); background: rgba(232,83,10,0.05); }
 </style>
-
 </head>
-<body>
-
-<header>
+<body><header>
   <div class="torch-left">🔥</div>
   <div class="torch-right">🔥</div>
   <div class="season-label">Season 50 · Survivor Pool</div>
   <h1>Survivor 50</h1>
-  <div class="subtitle">The Pool · Winners Never Quit</div>
-</header>
-
-<nav>
+  <div class="subtitle">Outwit, Outplay, Outlast.</div>
+</header><nav>
   <button class="active" onclick="showPanel('leaderboard', this)">🏆 Leaderboard</button>
   <button onclick="showPanel('cast', this)">🏝 Cast</button>
   <button onclick="showPanel('predictions', this)">🔮 Predictions</button>
   <button onclick="showPanel('admin', this)">🔒 Admin</button>
-</nav>
-
-<main>
-
-  <!-- LEADERBOARD -->
-
-  <div id="leaderboard" class="panel active">
+</nav><main><!-- LEADERBOARD --><div id="leaderboard" class="panel active">
     <div class="pot-banner">
       <div>
         <div class="pot-label">Total Pot</div>
@@ -685,17 +591,14 @@ transition: all 0.2s;
       </div>
     </div>
 
-```
 <div class="section-heading">Standings</div>
 <div class="scroll-hint">
   <table class="lb-table" id="lb-table">
     <thead>
       <tr>
         <th>#</th>
-        <th>Player</th>
-        <th>Draft Picks</th>
+        <th style="max-width:300px">Player + Draft Picks</th>
         <th>Winner Pick</th>
-        
         <th style="text-align:right">Score</th>
       </tr>
     </thead>
@@ -709,7 +612,7 @@ transition: all 0.2s;
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:0.75rem;font-size:0.8rem;color:var(--text-dim)">
     <div style="background:var(--mid);padding:1rem;border-radius:4px;border:1px solid rgba(255,255,255,0.05)">
       <div style="font-family:'Cinzel',serif;color:var(--gold);font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.6rem">Survival (Draft)</div>
-      <div>Survives a Tribal vote: <strong style="color:var(--ember)">+5</strong></div>
+      <div>Survives an episode: <strong style="color:var(--ember)">+5</strong></div>
       <div style="margin-top:0.3rem">Reaches the merge: <strong style="color:var(--ember)">+10</strong></div>
       <div style="margin-top:0.3rem">Makes Final Tribal: <strong style="color:var(--ember)">+15</strong></div>
       <div style="margin-top:0.3rem">Wins the season: <strong style="color:var(--ember)">+25</strong></div>
@@ -731,20 +634,12 @@ transition: all 0.2s;
     </div>
   </div>
 </div>
-```
 
-  </div>
 
-  <!-- CAST -->
-
-  <div id="cast" class="panel">
+</div><!-- CAST --><div id="cast" class="panel">
     <div class="section-heading">Full Cast · Season 50</div>
     <div class="cast-grid" id="cast-grid"></div>
-  </div>
-
-  <!-- PREDICTIONS -->
-
-  <div id="predictions" class="panel">
+  </div><!-- PREDICTIONS --><div id="predictions" class="panel">
     <div class="section-heading">Preseason Predictions</div>
     <div style="background:var(--mid);border:1px solid rgba(201,168,76,0.2);border-radius:4px;padding:1.2rem 1.5rem;margin-bottom:1.5rem;font-size:0.85rem;color:var(--text-dim);line-height:1.6">
       <strong style="color:var(--gold);font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;display:block;margin-bottom:0.5rem">🔮 Three predictions, locked once submitted</strong>
@@ -753,11 +648,7 @@ transition: all 0.2s;
       <strong style="color:var(--text)">Boomerang Idol 2</strong> (Christian → Aubry) — predict its fate. Correct = <strong style="color:var(--ember)">+15 pts</strong>
     </div>
     <div id="predictions-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem"></div>
-  </div>
-
-  <!-- ADMIN -->
-
-  <div id="admin" class="panel">
+  </div><!-- ADMIN --><div id="admin" class="panel">
     <div id="admin-lock-screen" class="admin-lock">
       <h2>Tribal Council</h2>
       <p>Admin access only. Enter the password to continue.</p>
@@ -767,67 +658,79 @@ transition: all 0.2s;
     </div>
     <div id="admin-panel" style="display:none">
       <div class="admin-grid">
+        <div class="admin-card" style="grid-column:1/-1">
+  <h3>📺 Record Episode</h3>
+  <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:1.5rem">Log everything that happened in one go. Review the summary before applying points.</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem">
 
-```
-    <div class="admin-card" style="grid-column:1/-1">
-      <h3>📺 Record Episode</h3>
-      <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:1.5rem">Log everything that happened in one go. Review the summary before applying points.</p>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem">
+<div>
+  <div style="font-size:0.7rem;font-family:'Cinzel',serif;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem">Episode Week #</div>
+  <input type="number" id="ep-week" placeholder="e.g. 4" min="1" max="15" style="width:100%;background:var(--surface);border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:0.6rem 0.8rem;font-family:'Lato',sans-serif;font-size:0.85rem;border-radius:2px;outline:none">
+</div>
 
-        <div>
-          <div style="font-size:0.7rem;font-family:'Cinzel',serif;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem">Episode Week #</div>
-          <input type="number" id="ep-week" placeholder="e.g. 4" min="1" max="15" style="width:100%;background:var(--surface);border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:0.6rem 0.8rem;font-family:'Lato',sans-serif;font-size:0.85rem;border-radius:2px;outline:none">
-        </div>
 
-        <div>
-          <div style="font-size:0.7rem;font-family:'Cinzel',serif;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem">Voted Out / Medevac</div>
-          <select id="ep-boot" style="width:100%;background:var(--surface);border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:0.6rem 0.8rem;font-family:'Lato',sans-serif;font-size:0.85rem;border-radius:2px;outline:none;margin-bottom:0.4rem">
-            <option value="">— Nobody / skip —</option>
-          </select>
-          <select id="ep-boot-type" style="width:100%;background:var(--surface);border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:0.6rem 0.8rem;font-family:'Lato',sans-serif;font-size:0.85rem;border-radius:2px;outline:none">
-            <option value="voted">Voted out</option>
-            <option value="medevac">Medevac / quit (no survival pts)</option>
-          </select>
-        </div>
+<div>
+  <div style="font-size:0.7rem;font-family:'Cinzel',serif;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem">Voted Out / Medevac</div>
+  <div id="ep-boot-list" style="max-height:160px;overflow-y:auto;background:var(--surface);border:1px solid rgba(255,255,255,0.1);border-radius:2px;padding:0.4rem 0.6rem;margin-bottom:0.4rem"></div>
+  <select id="ep-boot-type" style="width:100%;background:var(--surface);border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:0.6rem 0.8rem;font-family:'Lato',sans-serif;font-size:0.85rem;border-radius:2px;outline:none">
+    <option value="voted">Voted out</option>
+    <option value="medevac">Medevac / quit (no survival pts)</option>
+  </select>
+  <div style="font-size:0.65rem;color:var(--muted);margin-top:0.3rem;font-style:italic">Check all who were eliminated</div>
+</div>
 
-        <div>
-          <div style="font-size:0.7rem;font-family:'Cinzel',serif;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem">Won Immunity <span style="color:var(--muted)">(+3 pts)</span></div>
-          <div id="ep-immunity-list" style="max-height:160px;overflow-y:auto;background:var(--surface);border:1px solid rgba(255,255,255,0.1);border-radius:2px;padding:0.4rem 0.6rem"></div>
-          <div style="font-size:0.65rem;color:var(--muted);margin-top:0.3rem;font-style:italic">Only drafted contestants shown</div>
-        </div>
+<div>
+  <div style="font-size:0.7rem;font-family:'Cinzel',serif;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem">Won Immunity <span style="color:var(--muted)">(+3 pts)</span></div>
+  <div id="ep-immunity-list" style="max-height:160px;overflow-y:auto;background:var(--surface);border:1px solid rgba(255,255,255,0.1);border-radius:2px;padding:0.4rem 0.6rem"></div>
+  <div style="font-size:0.65rem;color:var(--muted);margin-top:0.3rem;font-style:italic">Only drafted contestants shown</div>
+</div>
 
-        <div>
-          <div style="font-size:0.7rem;font-family:'Cinzel',serif;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem">Found Idol or Advantage <span style="color:var(--muted)">(+5 pts each)</span></div>
-          <div id="ep-found-list" style="max-height:160px;overflow-y:auto;background:var(--surface);border:1px solid rgba(255,255,255,0.1);border-radius:2px;padding:0.4rem 0.6rem"></div>
-          <div style="font-size:0.65rem;color:var(--muted);margin-top:0.3rem;font-style:italic">Only drafted contestants shown</div>
-        </div>
+<div>
+  <div style="font-size:0.7rem;font-family:'Cinzel',serif;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem">Found Idol or Advantage <span style="color:var(--muted)">(+5 pts each)</span></div>
+  <div id="ep-found-list" style="max-height:160px;overflow-y:auto;background:var(--surface);border:1px solid rgba(255,255,255,0.1);border-radius:2px;padding:0.4rem 0.6rem"></div>
+  <div style="font-size:0.65rem;color:var(--muted);margin-top:0.3rem;font-style:italic">Only drafted contestants shown</div>
+</div>
 
-        <div>
-          <div style="font-size:0.7rem;font-family:'Cinzel',serif;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem">Played Idol or Advantage <span style="color:var(--muted)">(+5 pts each)</span></div>
-          <div id="ep-played-list" style="max-height:160px;overflow-y:auto;background:var(--surface);border:1px solid rgba(255,255,255,0.1);border-radius:2px;padding:0.4rem 0.6rem"></div>
-          <div style="font-size:0.65rem;color:var(--muted);margin-top:0.3rem;font-style:italic">Only drafted contestants shown</div>
-        </div>
+<div>
+  <div style="font-size:0.7rem;font-family:'Cinzel',serif;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem">Played Idol or Advantage <span style="color:var(--muted)">(+5 pts each)</span></div>
+  <div id="ep-played-list" style="max-height:160px;overflow-y:auto;background:var(--surface);border:1px solid rgba(255,255,255,0.1);border-radius:2px;padding:0.4rem 0.6rem"></div>
+  <div style="font-size:0.65rem;color:var(--muted);margin-top:0.3rem;font-style:italic">Only drafted contestants shown</div>
+</div>
 
-        <div>
-          <div style="font-size:0.7rem;font-family:'Cinzel',serif;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem">Said Episode Title <span style="color:var(--muted)">(+10 pts)</span></div>
-          <div id="ep-title-list" style="max-height:160px;overflow-y:auto;background:var(--surface);border:1px solid rgba(255,255,255,0.1);border-radius:2px;padding:0.4rem 0.6rem"></div>
-          <div style="font-size:0.65rem;color:var(--muted);margin-top:0.3rem;font-style:italic">Only drafted contestants shown</div>
-        </div>
+<div>
+  <div style="font-size:0.7rem;font-family:'Cinzel',serif;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem">Said Episode Title <span style="color:var(--muted)">(+10 pts)</span></div>
+  <div id="ep-title-list" style="max-height:160px;overflow-y:auto;background:var(--surface);border:1px solid rgba(255,255,255,0.1);border-radius:2px;padding:0.4rem 0.6rem"></div>
+  <div style="font-size:0.65rem;color:var(--muted);margin-top:0.3rem;font-style:italic">Only drafted contestants shown</div>
+</div>
 
-      </div>
-      <button class="btn" onclick="previewEpisode()" style="margin-top:1.5rem;font-size:0.8rem;padding:0.8rem 2rem">Preview Summary &#8594;</button>
+
+</div>
+  <button class="btn" onclick="previewEpisode()" style="margin-top:1.5rem;font-size:0.8rem;padding:0.8rem 2rem">Preview Summary →</button>
+</div><div id="ep-summary-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:10000;align-items:center;justify-content:center;padding:1rem">
+  <div style="background:var(--mid);border:1px solid rgba(201,168,76,0.3);border-radius:6px;max-width:500px;width:100%;padding:2rem;max-height:90vh;overflow-y:auto">
+    <div style="font-family:'Cinzel Decorative',serif;color:var(--gold);font-size:1.1rem;margin-bottom:1.5rem">📺 Episode Summary</div>
+    <div id="ep-summary-content" style="font-size:0.85rem;line-height:1.8;color:var(--text-dim)"></div>
+    <div style="display:flex;gap:1rem;margin-top:1.5rem">
+      <button class="btn" onclick="applyEpisode()" style="flex:1">✅ Apply Points</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('ep-summary-modal').style.display='none'" style="flex:1">← Go Back</button>
     </div>
+  </div>
+</div>
 
-    <div id="ep-summary-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:10000;align-items:center;justify-content:center;padding:1rem">
-      <div style="background:var(--mid);border:1px solid rgba(201,168,76,0.3);border-radius:6px;max-width:500px;width:100%;padding:2rem;max-height:90vh;overflow-y:auto">
-        <div style="font-family:'Cinzel Decorative',serif;color:var(--gold);font-size:1.1rem;margin-bottom:1.5rem">&#128250; Episode Summary</div>
-        <div id="ep-summary-content" style="font-size:0.85rem;line-height:1.8;color:var(--text-dim)"></div>
-        <div style="display:flex;gap:1rem;margin-top:1.5rem">
-          <button class="btn" onclick="applyEpisode()" style="flex:1">&#10003; Apply Points</button>
-          <button class="btn btn-ghost" onclick="document.getElementById('ep-summary-modal').style.display='none'" style="flex:1">&#8592; Go Back</button>
-        </div>
-      </div>
-    </div>
+    <div class="admin-card">
+
+
+<h3>🏝 Record Milestone</h3>
+  <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:1rem">Award one-time milestone bonuses to all surviving drafted contestants.</p>
+  <div class="form-group">
+    <label>Milestone</label>
+    <select id="milestone-type">
+      <option value="merge">Reached the Merge (+10 per surviving drafted player)</option>
+      <option value="final_tribal">Made Final Tribal Council (+15 per surviving drafted player)</option>
+    </select>
+  </div>
+  <button class="btn" onclick="recordMilestone()">Award Milestone</button>
+</div>
 
     <div class="admin-card">
       <h3>🌐 Shared Backend</h3>
@@ -955,38 +858,12 @@ transition: all 0.2s;
 
   </div>
 </div>
-```
 
-  </div>
 
-</main>
-
-<!-- Spoiler Gate -->
-
-<div id="spoiler-gate" style="display:none;position:fixed;inset:0;background:rgba(13,11,8,0.97);z-index:99998;align-items:center;justify-content:center;padding:2rem">
-  <div style="max-width:480px;width:100%;text-align:center">
-    <div style="font-size:3rem;margin-bottom:1.5rem">&#128293;</div>
-    <div style="font-family:'Cinzel Decorative',serif;color:var(--gold);font-size:1.3rem;margin-bottom:1rem">Survivor 50 Pool</div>
-    <div style="font-family:'Cinzel',serif;color:var(--ember);font-size:0.7rem;letter-spacing:0.3em;text-transform:uppercase;margin-bottom:1.5rem">&#9888; Spoiler Warning</div>
-    <div id="spoiler-gate-msg" style="font-size:0.95rem;color:var(--text-dim);line-height:1.8;margin-bottom:2rem"></div>
-    <button class="btn" onclick="dismissGate()" style="font-size:0.85rem;padding:0.8rem 2.5rem">I've seen this episode &#10003;</button>
-  </div>
-</div>
-
-<!-- Loading overlay -->
-
-<div id="app-loader" style="display:flex;position:fixed;inset:0;background:var(--dark);z-index:99999;align-items:center;justify-content:center;flex-direction:column;gap:1rem">
+</div></main><!-- Loading overlay --><div id="app-loader" style="display:flex;position:fixed;inset:0;background:var(--dark);z-index:99999;align-items:center;justify-content:center;flex-direction:column;gap:1rem">
   <div style="font-size:3rem;animation:flicker 1s ease-in-out infinite alternate">🔥</div>
   <div id="app-loader-msg" style="font-family:'Cinzel',serif;color:var(--gold);letter-spacing:0.2em;font-size:0.8rem;text-transform:uppercase">Loading...</div>
-</div>
-
-<!-- Sync indicator -->
-
-<div id="sync-indicator" style="position:fixed;bottom:1rem;left:1rem;font-family:'Cinzel',serif;font-size:0.65rem;color:var(--gold);letter-spacing:0.15em;opacity:0;transition:opacity 0.3s;z-index:9997">⟳ Syncing...</div>
-
-<div class="toast" id="toast"></div>
-
-<script>
+</div><!-- Sync indicator --><div id="sync-indicator" style="position:fixed;bottom:1rem;left:1rem;font-family:'Cinzel',serif;font-size:0.65rem;color:var(--gold);letter-spacing:0.15em;opacity:0;transition:opacity 0.3s;z-index:9997">⟳ Syncing...</div><div class="toast" id="toast"></div><script>
 // ==================== STATE ====================
 const DEFAULT_CAST = [
   // CILA (orange)
@@ -1034,18 +911,13 @@ function getDefaultState() {
     currentWeek: 3,
     players: [],
     cast: JSON.parse(JSON.stringify(DEFAULT_CAST)),
-    eliminations: [
-      { week: 1, contestantId: 7,  idolPlayed: false },
-      { week: 2, contestantId: 23, idolPlayed: false, isMedevac: true },
-      { week: 3, contestantId: 8,  idolPlayed: false },
-    ],
+    eliminations: [],
     winnerPredictions: {},
     idolPredictions: {},
     idolOutcomes: { idol1: null, idol2: null },
     soleSurvivor: null,
     draftPicks: {},
     scores: {},
-    lastEpisodeLogged: null,
   };
 }
 
@@ -1064,21 +936,6 @@ function showSyncing() {
 
 function hideSyncing() {
   document.getElementById('sync-indicator').style.opacity = '0';
-}
-
-function showSpoilerGate() {
-  if (!state.lastEpisodeLogged) return;
-  const { episode, date } = state.lastEpisodeLogged;
-  document.getElementById('spoiler-gate-msg').innerHTML =
-    `Scores were last updated after<br>
-    <strong style="color:var(--text);font-family:'Cinzel',serif;font-size:1.1rem">Episode ${episode}</strong><br>
-    <span style="font-size:0.8rem;color:var(--muted)">${date}</span><br><br>
-    <span style="color:var(--ember)">Only continue if you have seen this episode!</span>`;
-  document.getElementById('spoiler-gate').style.display = 'flex';
-}
-
-function dismissGate() {
-  document.getElementById('spoiler-gate').style.display = 'none';
 }
 
 async function initApp() {
@@ -1102,7 +959,6 @@ async function initApp() {
     toast('⚠️ Could not reach server');
   }
   hideLoader();
-  showSpoilerGate();
   renderLeaderboard();
   setInterval(pollForUpdates, 15000);
 }
@@ -1123,7 +979,6 @@ function nullSafe(data) {
   d.soleSurvivor = data.soleSurvivor || null;
   d.draftPicks = data.draftPicks || {};
   d.scores = data.scores || {};
-  d.lastEpisodeLogged = data.lastEpisodeLogged || null;
   return d;
 }
 
@@ -1156,7 +1011,6 @@ function migrateState(raw) {
   fresh.soleSurvivor = raw.soleSurvivor || null;
   fresh.eliminations = raw.eliminations || fresh.eliminations;
   fresh.currentWeek = raw.currentWeek || 3;
-  fresh.lastEpisodeLogged = raw.lastEpisodeLogged || null;
   return fresh;
 }
 
@@ -1200,10 +1054,8 @@ function getPot() {
 }
 
 function recalcScores() {
-  // Preserve existing bonuses before reset
   const existingBonuses = {};
   state.players.forEach(p => { existingBonuses[p] = state.scores[p]?.bonus || 0; });
-
   state.scores = {};
   state.players.forEach(p => { state.scores[p] = { draft: 0, prediction: 0, bonus: existingBonuses[p] || 0 }; });
 
@@ -1265,12 +1117,12 @@ function renderLeaderboard() {
     return;
   }
 
-  const sorted = [...state.players].sort((a, b) => {
-    const sa = (state.scores[a]?.draft||0) + (state.scores[a]?.prediction||0) + (state.scores[a]?.bonus||0);
-    const sb = (state.scores[b]?.draft||0) + (state.scores[b]?.prediction||0) + (state.scores[b]?.bonus||0);
-    return sb - sa;
-  });
-
+const sorted = [...state.players].sort((a, b) => {
+  const sa = (state.scores[a]?.draft||0) + (state.scores[a]?.prediction||0) + (state.scores[a]?.bonus||0);
+  const sb = (state.scores[b]?.draft||0) + (state.scores[b]?.prediction||0) + (state.scores[b]?.bonus||0);
+  return sb - sa;
+});
+  
   body.innerHTML = sorted.map((player, i) => {
     const sc = state.scores[player] || { draft: 0, prediction: 0 };
     const total = sc.draft + sc.prediction + (sc.bonus || 0);
@@ -1282,8 +1134,9 @@ function renderLeaderboard() {
 
     const predId = state.winnerPredictions[player];
     const predC = predId ? getContestant(predId) : null;
+    const predEliminated = predC && !predC.alive && !state.soleSurvivor;
     const predDisplay = predC
-      ? `<span style="color:${state.soleSurvivor===predId ? '#6DC96D' : state.soleSurvivor ? '#C96D6D' : 'var(--gold)'};font-family:'Cinzel',serif;font-size:0.8rem">${predC.emoji} ${predC.name}</span>`
+      ? `<span style="color:${state.soleSurvivor===predId ? '#6DC96D' : (!predC.alive || state.soleSurvivor) ? '#C96D6D' : 'var(--gold)'};font-family:'Cinzel',serif;font-size:0.8rem;${predEliminated ? 'text-decoration:line-through;opacity:0.6;' : ''}">${predC.emoji} ${predC.name}</span>`
       : `<span style="color:var(--muted);font-size:0.75rem;font-style:italic">not set</span>`;
 
     const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
@@ -1294,10 +1147,10 @@ function renderLeaderboard() {
         <td class="rank ${rankClass}">${rankSymbol}</td>
         <td>
           <div class="player-name">${player}</div>
-          <div class="player-picks">${picks || '<span style="color:var(--muted);font-size:0.7rem">No draft picks</span>'}</div>
+         <div class="player-picks" style="max-width:300px">${picks || '<span style="color:var(--muted);font-size:0.7rem">No draft picks</span>'}</div>
         </td>
-        <td>${predDisplay}</td>
-        <td class="score-cell">${total}</td>
+      <td>${predDisplay}</td>
+      <td class="score-cell">${total}</td>
       </tr>`;
   }).join('');
 }
@@ -1648,7 +1501,7 @@ function confirmReset() {
   }
 }
 
-// ==================== RECORD EPISODE ====================
+  // ==================== RECORD EPISODE ====================
 function getDraftedContestants() {
   const allDrafted = [];
   state.players.forEach(player => {
@@ -1672,15 +1525,14 @@ function checkboxList(contestants, prefix) {
 function renderEpisodeForm() {
   const drafted = getDraftedContestants();
   const aliveAll = state.cast.filter(c => c.alive);
-
-  // Boot dropdown — all alive contestants
-  const bootSel = document.getElementById('ep-boot');
-  if (bootSel) {
-    bootSel.innerHTML = '<option value="">— Nobody / skip —</option>' +
-      aliveAll.map(c => `<option value="${c.id}">${c.emoji} ${c.name}</option>`).join('');
-  }
-
-  // Checkbox lists — only drafted alive contestants
+  const bootList = document.getElementById('ep-boot-list');
+if (bootList) {
+  bootList.innerHTML = aliveAll.map(c => `
+    <label style="display:flex;align-items:center;gap:0.5rem;padding:0.25rem 0;font-size:0.8rem;color:var(--text);cursor:pointer">
+      <input type="checkbox" id="boot-${c.id}" value="${c.id}" style="accent-color:var(--ember)">
+      ${c.emoji} ${c.name}
+    </label>`).join('');
+}
   const lists = ['ep-immunity-list', 'ep-found-list', 'ep-played-list', 'ep-title-list'];
   const prefixes = ['imm', 'found', 'played', 'title'];
   lists.forEach((id, i) => {
@@ -1697,110 +1549,77 @@ function getChecked(prefix) {
 function previewEpisode() {
   const week = parseInt(document.getElementById('ep-week').value);
   if (isNaN(week) || week < 1) { toast('Enter a valid week number'); return; }
-
-  const bootId = parseInt(document.getElementById('ep-boot').value) || null;
-  const bootType = document.getElementById('ep-boot-type').value;
+  const bootIds = Array.from(document.querySelectorAll('input[id^="boot-"]:checked')).map(cb => parseInt(cb.value));
+const bootType = document.getElementById('ep-boot-type').value;
   const immunity = getChecked('imm');
   const found = getChecked('found');
   const played = getChecked('played');
   const title = getChecked('title');
-
-  const bootC = bootId ? getContestant(bootId) : null;
   const drafted = getDraftedContestants();
-  const draftedIds = drafted.map(c => c.id);
-
-  // Build summary lines
   const lines = [];
-  lines.push(`<div style="margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid rgba(255,255,255,0.07)"><strong style="color:var(--gold);font-family:\'Cinzel\',serif">Week ${week}</strong></div>`);
-
-  if (bootC) {
-    const isMedevac = bootType === 'medevac';
+  lines.push(`<div style="margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid rgba(255,255,255,0.07)"><strong style="color:var(--gold);font-family:'Cinzel',serif">Week ${week}</strong></div>`);
+ if (bootIds.length > 0) {
+  const isMedevac = bootType === 'medevac';
+  bootIds.forEach(bootId => {
+    const bootC = getContestant(bootId);
     lines.push(`🪦 <strong>${bootC.name}</strong> ${isMedevac ? 'medevac/quit' : 'voted out'}`);
-    if (!isMedevac) {
-      // Survival points for all drafted players except the boot
-      const survivors = drafted.filter(c => c.id !== bootId);
-      if (survivors.length > 0) {
-        lines.push(`&nbsp;&nbsp;+5 survival pts → ${survivors.map(c => `<strong>${c.name}</strong> (${c.poolPlayer})`).join(', ')}`);
-      }
+  });
+  if (!isMedevac) {
+    const survivors = drafted.filter(c => !bootIds.includes(c.id));
+    if (survivors.length > 0) {
+      lines.push(`&nbsp;&nbsp;+5 survival pts → ${survivors.map(c => `<strong>${c.name}</strong> (${c.poolPlayer})`).join(', ')}`);
     }
-  } else {
-    lines.push(`🪦 No elimination this episode`);
   }
-
-  if (immunity.length > 0) {
-    immunity.forEach(id => {
-      const c = getContestant(id);
-      const owner = state.players.find(p => (state.draftPicks[p]||[]).includes(id));
-      lines.push(`🏆 <strong>${c?.name}</strong> won immunity → +3 pts to <strong>${owner}</strong>`);
-    });
-  }
-
-  if (found.length > 0) {
-    found.forEach(id => {
-      const c = getContestant(id);
-      const owner = state.players.find(p => (state.draftPicks[p]||[]).includes(id));
-      lines.push(`🔍 <strong>${c?.name}</strong> found idol/advantage → +5 pts to <strong>${owner}</strong>`);
-    });
-  }
-
-  if (played.length > 0) {
-    played.forEach(id => {
-      const c = getContestant(id);
-      const owner = state.players.find(p => (state.draftPicks[p]||[]).includes(id));
-      lines.push(`⚡ <strong>${c?.name}</strong> played idol/advantage → +5 pts to <strong>${owner}</strong>`);
-    });
-  }
-
-  if (title.length > 0) {
-    title.forEach(id => {
-      const c = getContestant(id);
-      const owner = state.players.find(p => (state.draftPicks[p]||[]).includes(id));
-      lines.push(`🗣 <strong>${c?.name}</strong> said the episode title → +10 pts to <strong>${owner}</strong>`);
-    });
-  }
-
-  // Store pending episode data
-  window._pendingEpisode = { week, bootId, bootType, immunity, found, played, title };
-
+} else {
+  lines.push(`🪦 No elimination this episode`);
+}
+  immunity.forEach(id => {
+    const c = getContestant(id);
+    const owner = state.players.find(p => (state.draftPicks[p]||[]).includes(id));
+    lines.push(`🏆 <strong>${c?.name}</strong> won immunity → +3 pts to <strong>${owner}</strong>`);
+  });
+  found.forEach(id => {
+    const c = getContestant(id);
+    const owner = state.players.find(p => (state.draftPicks[p]||[]).includes(id));
+    lines.push(`🔍 <strong>${c?.name}</strong> found idol/advantage → +5 pts to <strong>${owner}</strong>`);
+  });
+  played.forEach(id => {
+    const c = getContestant(id);
+    const owner = state.players.find(p => (state.draftPicks[p]||[]).includes(id));
+    lines.push(`⚡ <strong>${c?.name}</strong> played idol/advantage → +5 pts to <strong>${owner}</strong>`);
+  });
+  title.forEach(id => {
+    const c = getContestant(id);
+    const owner = state.players.find(p => (state.draftPicks[p]||[]).includes(id));
+    lines.push(`🗣 <strong>${c?.name}</strong> said the episode title → +10 pts to <strong>${owner}</strong>`);
+  });
+window._pendingEpisode = { week, bootIds, bootType, immunity, found, played, title };
   document.getElementById('ep-summary-content').innerHTML = lines.join('<br>');
-  const modal = document.getElementById('ep-summary-modal');
-  modal.style.display = 'flex';
+  document.getElementById('ep-summary-modal').style.display = 'flex';
 }
 
 function applyEpisode() {
   const ep = window._pendingEpisode;
   if (!ep) return;
-
-  const { week, bootId, bootType, immunity, found, played, title } = ep;
-  const isMedevac = bootType === 'medevac';
-
-  // Record elimination
-  if (bootId) {
-    state.eliminations.push({ week, contestantId: bootId, idolPlayed: false, isMedevac });
-    const c = getContestant(bootId);
-    if (c) c.alive = false;
-  }
-
-  // Bonus points — immunity, found, played, title
-  const drafted = [];
-  state.players.forEach(p => (state.draftPicks[p]||[]).forEach(cid => drafted.push({ cid, player: p })));
-
+ const { week, bootIds, bootType, immunity, found, played, title } = ep;
+const isMedevac = bootType === 'medevac';
+bootIds.forEach(bootId => {
+  state.eliminations.push({ week, contestantId: bootId, idolPlayed: false, isMedevac });
+  const c = getContestant(bootId);
+  if (c) c.alive = false;
+});
   function awardBonus(cid, pts) {
     const owner = state.players.find(p => (state.draftPicks[p]||[]).includes(cid));
     if (!owner) return;
     if (!state.scores[owner]) state.scores[owner] = { draft: 0, prediction: 0, bonus: 0 };
     state.scores[owner].bonus = (state.scores[owner].bonus || 0) + pts;
   }
-
   immunity.forEach(cid => awardBonus(cid, 3));
   found.forEach(cid => awardBonus(cid, 5));
   played.forEach(cid => awardBonus(cid, 5));
   title.forEach(cid => awardBonus(cid, 10));
-
   recalcScores();
   saveState();
-
-  // Close modal and reset form
   document.getElementById('ep-summary-modal').style.display = 'none';
   document.getElementById('ep-week').value = '';
   renderEpisodeForm();
@@ -1809,9 +1628,25 @@ function applyEpisode() {
   window._pendingEpisode = null;
 }
 
+  function recordMilestone() {
+  const type = document.getElementById('milestone-type').value;
+  const pts = type === 'merge' ? 10 : 15;
+  const label = type === 'merge' ? 'Merge' : 'Final Tribal';
+
+  const drafted = getDraftedContestants(); // only alive drafted players
+  if (drafted.length === 0) { toast('No surviving drafted contestants found'); return; }
+
+  drafted.forEach(c => {
+    const owner = c.poolPlayer;
+    if (!state.scores[owner]) state.scores[owner] = { draft: 0, prediction: 0, bonus: 0 };
+    state.scores[owner].bonus = (state.scores[owner].bonus || 0) + pts;
+  });
+
+  saveState();
+  toast(`${label} bonus awarded! +${pts} pts to ${drafted.length} contestants 🏝`);
+}
+
 // ==================== INIT ====================
 initApp();
-</script>
-
-</body>
+</script></body>
 </html>
