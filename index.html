@@ -1724,6 +1724,7 @@ bootIds.forEach(bootId => {
   found.forEach(cid => awardBonus(cid, 5));
   played.forEach(cid => awardBonus(cid, 5));
   title.forEach(cid => awardBonus(cid, 10));
+  state.currentWeek = Math.max(state.currentWeek, week);
   recalcScores();
   saveState();
   document.getElementById('ep-summary-modal').style.display = 'none';
